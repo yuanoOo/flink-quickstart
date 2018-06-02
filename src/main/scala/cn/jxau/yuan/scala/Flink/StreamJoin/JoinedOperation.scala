@@ -14,6 +14,10 @@ import org.apache.flink.util.Collector
   * Created by zhe on 2016/6/21.
   *
   * 详情：https://blog.csdn.net/lmalds/article/details/51743038，有如何提交运行
+  *
+  * join操作与coGroup操作在Flink流处理中很有用，其中coGroup相对来讲功能更强大一点。
+  * 但是，相对于Spark提供了Spark SQL而言，Flink在DataStream中队SQL的支持显然不够，
+  *   在即将到来的Flink1.1以及未来的Flink1.2版本中，DataStream中会有对SQL的支持，那时候写起程序会容易的多。
   */
 object JoinedOperation {
   case class Transaction(szWindCode:String, szCode:Long, nAction:String, nTime:String, seq:Long, nIndex:Long, nPrice:Long,nVolume:Long, nTurnover:Long, nBSFlag:Int, chOrderKind:String, chFunctionCode:String,nAskOrder:Long, nBidOrder:Long, localTime:Long)

@@ -18,6 +18,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
   *        3、采用TumblingEventTimeWindow作为窗口，即翻滚窗口，不重叠的范围内实现统计
   *
   * 注意：自定义function与operator都应该是有状态的，以便恢复，这里简化，并没有设置state
+  * https://blog.csdn.net/lmalds/article/details/51699037
   */
 object TransactionSumVolume1 /*交易量*/{
   case class Transaction(szWindCode:String, szCode:Long, nAction:String, nTime:String, seq:Long, nIndex:Long, nPrice:Long,
