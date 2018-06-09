@@ -23,46 +23,33 @@ import org.apache.flink.core.fs.FileSystem.WriteMode
 import org.apache.flink.streaming.api.scala._
 
 /**
- * Skeleton for a Flink Streaming Job.
- *
- * For a tutorial how to write a Flink streaming application, check the
- * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
- *
- * To package your appliation into a JAR file for execution, run
- * 'mvn clean package' on the command line.
- *
- * If you change the name of the main class (with the public static void main(String[] args))
- * method, change the respective entry in the POM.xml file (simply search for 'mainClass').
- */
+  * Skeleton for a Flink Streaming Job.
+  *
+  * For a tutorial how to write a Flink streaming application, check the
+  * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
+  *
+  * To package your appliation into a JAR file for execution, run
+  * 'mvn clean package' on the command line.
+  *
+  * If you change the name of the main class (with the public static void main(String[] args))
+  * method, change the respective entry in the POM.xml file (simply search for 'mainClass').
+  */
 object StreamingJob {
-  def main(args: Array[String]) {
-    // set up the streaming execution environment
-    val env = ExecutionEnvironment.getExecutionEnvironment
+    def main(args: Array[String]) {
+        // set up the streaming execution environment
+        val env = ExecutionEnvironment.getExecutionEnvironment
 
-    /*
-     * Here, you can start creating your execution plan for Flink.
-     *
-     * Start with getting some data from the environment, like
-     *  env.readTextFile(textPath);
-     *
-     * then, transform the resulting DataStream[String] using operations
-     * like
-     *   .filter()
-     *   .flatMap()
-     *   .join()
-     *   .group()
-     *
-     * and many more.
-     * Have a look at the programming guide:
-     *
-     * http://flink.apache.org/docs/latest/apis/streaming/index.html
-     *
-     */
-    env.readTextFile("E:\\idea\\quickstart\\src\\main\\resources\\log4j.properties")
-      .flatMap(_.toLowerCase.split("\\w+") filter {_.nonEmpty})
-      .map((_,1))
-      .groupBy(0)
-      .sum(1)
-      .writeAsText("E:\\yyy.csv", WriteMode.NO_OVERWRITE)
-  }
+        env.readTextFile("E:\\idea\\quickstart\\src\\main\\resources\\log4j.properties")
+            .flatMap(_.toLowerCase.split("\\w+") filter {
+                _.nonEmpty
+            })
+            .map((_, 1))
+            .groupBy(0)
+            .sum(1)
+            .writeAsText("E:\\yyy.csv", WriteMode.NO_OVERWRITE)
+            // 设置保存统计结果为单个线程，而不是并行的
+            .setParallelism(1)
+
+        env.execute("word_count")
+    }
 }
