@@ -47,7 +47,7 @@ object StreamingJob {
             .groupBy(0)
             .sum(1)
             .writeAsText("E:\\yyy.csv", WriteMode.NO_OVERWRITE)
-            // 设置保存统计结果为单个线程，而不是并行的
+            // 设置保存统计结果为单个线程，而不是并行的，这样结果就不会被保存在多个文件中了
             .setParallelism(1)
 
         env.execute("word_count")
