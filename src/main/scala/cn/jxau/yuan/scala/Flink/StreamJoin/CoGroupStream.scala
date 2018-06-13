@@ -1,3 +1,5 @@
+package cn.jxau.yuan.scala.Flink.StreamJoin
+
 import java.text.SimpleDateFormat
 
 import org.apache.flink.api.common.functions.MapFunction
