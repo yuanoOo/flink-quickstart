@@ -131,7 +131,7 @@ object CoGroupStream {
             //out.collect(item._1,item._2,item._3,item._4,item._5)
           }
 
-          if(!l.isEmpty) {
+          if(l.nonEmpty) {
             val szCode = l.head._1
             val tranStartTime = l.head._2
             val tranEndTime = l.last._2
