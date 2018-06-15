@@ -1,3 +1,5 @@
+package cn.jxau.yuan.scala.Flink.watermark
+
 import java.text.SimpleDateFormat
 
 import org.apache.flink.streaming.api.TimeCharacteristic
