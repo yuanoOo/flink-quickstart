@@ -1,14 +1,19 @@
 package cn.jxau.yuan.scala.yuan.scala
 
+import java.io.IOException
 import java.util.Properties
 
+import org.apache.flink.api.common.io.OutputFormat
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
+import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
-import org.joda.time.DateTime
+import org.apache.hadoop.hbase.HBaseConfiguration
+import org.apache.hadoop.hbase.client.{HTable, Put}
+import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.LoggerFactory
 import suishen.message.event.define.PVEvent
 
@@ -42,7 +47,7 @@ object FlinkKafkaExample {
             .timeWindowAll(Time.minutes(5))
             .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name))
             .uid("reduce app_key operator")
-            .print()
+            .writeUsingOutputFormat(new HBaseOutputFormat())
 
         env.execute("local-cluster-flink-kafka-test")
     }
@@ -55,4 +60,45 @@ object FlinkKafkaExample {
       * @param name
       */
     case class PvEvent(time: Long, appKey: Long, name: String)
+
+    /**
+      * This class implements an OutputFormat for HBase.
+      */
+    @SerialVersionUID(1L)
+    private class HBaseOutputFormat extends OutputFormat[PvEvent] {
+        private var conf: org.apache.hadoop.conf.Configuration= null
+        private var table: HTable = null
+        private var taskNumber: String = null
+        private var rowNumber = 0
+
+        private val HBASE_ZK_QURUM = "node101.bigdata.dmp.local.com:2181,node102.bigdata.dmp.local.com:2181,node103.bigdata.dmp.local.com:2181"
+        private val HBASE_TABLE = "hbase_flink_test"
+
+        override def configure(parameters: Configuration): Unit = {
+            conf = HBaseConfiguration.create()
+            conf.set("hbase.zookeeper.quorum", HBASE_ZK_QURUM)
+        }
+
+        @throws[IOException]
+        override def open(taskNumber: Int, numTasks: Int): Unit = {
+            table = new HTable(conf, HBASE_TABLE)
+            this.taskNumber = String.valueOf(taskNumber)
+        }
+
+        @throws[IOException]
+        override def writeRecord(record: PvEvent): Unit = {
+            val put = new Put(Bytes.toBytes(record.appKey + record.name))
+            put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("time"), Bytes.toBytes(record.time))
+            put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("appKey"), Bytes.toBytes(record.appKey))
+            put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("name"), Bytes.toBytes(record.name))
+            rowNumber += 1
+            table.put(put)
+        }
+
+        @throws[IOException]
+        override def close(): Unit = {
+            table.flushCommits()
+            table.close()
+        }
+    }
 }
