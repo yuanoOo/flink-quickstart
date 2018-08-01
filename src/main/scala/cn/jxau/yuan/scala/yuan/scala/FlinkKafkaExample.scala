@@ -34,7 +34,7 @@ object FlinkKafkaExample {
                     PVEvent.Entity.parseFrom(message)
                 }
             }, kafkaProps).setStartFromEarliest()
-        )
+        ).setParallelism(1)
                 .uid("pv-event-kafka-source")
                 .filter(_ != null)
                 .uid("filter null pv-event")
