@@ -42,12 +42,28 @@ under the License.
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+
+		<repository>
+			<id>nexus-suishen</id>
+			<name>Nexus suishen</name>
+			<url>http://maven.etouch.cn/nexus/content/groups/public/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+		</repository>
 	</repositories>
 
 	<!--制定版本号等内容-->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<flink.version>1.5-SNAPSHOT</flink.version>
+		<flink.version>1.4.2</flink.version>
 		<scala.binary.version>2.11</scala.binary.version>
 		<scala.version>2.11.12</scala.version>
 	</properties>
@@ -82,6 +98,28 @@ under the License.
 			<artifactId>flink-connector-kafka-0.10_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-connector-kafka-0.11_2.11</artifactId>
+			<version>1.4.2</version>
+		</dependency>
+
+        <dependency>
+            <groupId>ssy.dmp</groupId>
+            <artifactId>message-sdk</artifactId>
+            <version>1.7-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
 		<!-- Add logging framework, to produce console output when running in the IDE. -->
 		<!-- These dependencies are excluded from the application JAR by default. -->
