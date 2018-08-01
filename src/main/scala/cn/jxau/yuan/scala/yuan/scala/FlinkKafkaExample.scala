@@ -1,17 +1,13 @@
 package cn.jxau.yuan.scala.yuan.scala
 
-import java.text.SimpleDateFormat
 import java.util.Properties
 
-import org.apache.flink.api.common.serialization.{AbstractDeserializationSchema, SimpleStringSchema}
+import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
-import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormatter
+import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
 import suishen.message.event.define.PVEvent
 
 /**
@@ -50,9 +46,7 @@ object FlinkKafkaExample {
                 .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent))
                 .uid("map pv-event to case class")
                 .timeWindowAll(Time.minutes(5))
-                .reduce((e1, e2) => {
-                    PvEvent(e1.time, e1.appKey + e2.appKey, e1.name)
-                })
+                .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name))
                 .uid("reduce app_key operator")
                 .print()
 
