@@ -8,6 +8,8 @@ import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
+import org.joda.time.DateTime
+import org.slf4j.LoggerFactory
 import suishen.message.event.define.PVEvent
 
 /**
@@ -17,6 +19,7 @@ import suishen.message.event.define.PVEvent
   */
 object FlinkKafkaExample {
 
+    private val LOG = LoggerFactory.getLogger(FlinkKafkaExample.getClass)
     private val BOOTSTRAP_SERVERS = "node104.bigdata.dmp.local.com:9092,node105.bigdata.dmp.local.com:9092,node106.bigdata.dmp.local.com:9092"
 
     def main(args: Array[String]): Unit = {
@@ -28,31 +31,28 @@ object FlinkKafkaExample {
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
         env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
-        val transaction = env.addSource(new FlinkKafkaConsumer010[PVEvent.Entity]("pv-event",
-            new AbstractDeserializationSchema[PVEvent.Entity] {
-                override def deserialize(message: Array[Byte]): PVEvent.Entity = {
-                    PVEvent.Entity.parseFrom(message)
-                }
-            }, kafkaProps).setStartFromEarliest()
-        ).setParallelism(1)
-                .uid("pv-event-kafka-source")
-                .filter(_ != null)
-                .uid("filter null pv-event")
-                .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(100000)) {
-                    override def extractTimestamp(entity: PVEvent.Entity): Long = {
-                        entity.getEventTimeMs
-                    }
-                })
-                .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent))
-                .uid("map pv-event to case class")
-                .timeWindowAll(Time.minutes(5))
-                .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name))
-                .uid("reduce app_key operator")
-                .print()
+        env.addSource(new FlinkKafkaConsumer010[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
+            .setParallelism(2)
+            .uid("pv-event-kafka-source")
+            .filter(event => event != null && event.getNginxTimeMs > 1527584646000L)
+            .uid("filter null pv-event")
+            .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(1000)) {override def extractTimestamp(entity: PVEvent.Entity): Long = entity.getEventTimeMs})
+            .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent))
+            .uid("map pv-event to case class")
+            .timeWindowAll(Time.minutes(5))
+            .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name))
+            .uid("reduce app_key operator")
+            .print()
 
         env.execute("local-cluster-flink-kafka-test")
     }
 
+    /**
+      * extract some filed only for test
+      *
+      * @param time
+      * @param appKey
+      * @param name
+      */
     case class PvEvent(time: Long, appKey: Long, name: String)
-
 }
