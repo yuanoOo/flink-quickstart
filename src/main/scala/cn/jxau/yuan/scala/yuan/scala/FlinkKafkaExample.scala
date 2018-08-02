@@ -11,6 +11,7 @@ import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
+import org.apache.flink.util.StringUtils
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.{HTable, Put}
 import org.apache.hadoop.hbase.util.Bytes
@@ -42,10 +43,10 @@ object FlinkKafkaExample {
             .filter(event => event != null && event.getNginxTimeMs > 1527584646000L)
             .uid("filter null pv-event")
             .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(1000)) {override def extractTimestamp(entity: PVEvent.Entity): Long = entity.getEventTimeMs})
-            .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent))
+            .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, if(!StringUtils.isNullOrWhitespaceOnly(event.getImei)) event.getImei else event.getIdfa))
             .uid("map pv-event to case class")
             .timeWindowAll(Time.minutes(5))
-            .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name))
+            .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name, e1.deviceId))
             .uid("reduce app_key operator")
             .writeUsingOutputFormat(new HBaseOutputFormat())
 
@@ -59,7 +60,7 @@ object FlinkKafkaExample {
       * @param appKey
       * @param name
       */
-    case class PvEvent(time: Long, appKey: Long, name: String)
+    case class PvEvent(time: Long, appKey: Long, name: String, deviceId: String)
 
     /**
       * This class implements an OutputFormat for HBase.
@@ -87,10 +88,11 @@ object FlinkKafkaExample {
 
         @throws[IOException]
         override def writeRecord(record: PvEvent): Unit = {
-            val put = new Put(Bytes.toBytes(record.appKey + record.name))
+            val put = new Put(Bytes.toBytes(record.appKey + record.deviceId))
             put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("time"), Bytes.toBytes(record.time))
-            put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("appKey"), Bytes.toBytes(record.appKey))
+            put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("app_key"), Bytes.toBytes(record.appKey))
             put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("name"), Bytes.toBytes(record.name))
+            put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("device_id"), Bytes.toBytes(record.deviceId))
             rowNumber += 1
             table.put(put)
         }
