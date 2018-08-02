@@ -12,6 +12,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer010, FlinkKafkaConsumer011}
 import org.apache.flink.util.StringUtils
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.{HTable, Put}
 import org.apache.hadoop.hbase.util.Bytes
@@ -37,7 +38,7 @@ object FlinkKafkaExample {
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
         env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
-        env.addSource(new FlinkKafkaConsumer010[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
+        env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
             .setParallelism(2)
             .uid("pv-event-kafka-source")
             .filter(event => event != null && event.getNginxTimeMs > 1527584646000L)
