@@ -10,7 +10,7 @@ import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrderness
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
+import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer010, FlinkKafkaConsumer011}
 import org.apache.flink.util.StringUtils
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.{HTable, Put}
@@ -48,7 +48,8 @@ object FlinkKafkaExample {
             .timeWindowAll(Time.minutes(5))
             .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name, e1.deviceId))
             .uid("reduce app_key operator")
-            .writeUsingOutputFormat(new HBaseOutputFormat())
+                .print()
+//            .writeUsingOutputFormat(new HBaseOutputFormat())
 
         env.execute("local-cluster-flink-kafka-test")
     }
