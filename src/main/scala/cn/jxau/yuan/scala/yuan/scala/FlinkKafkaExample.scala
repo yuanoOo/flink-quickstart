@@ -49,6 +49,7 @@ object FlinkKafkaExample {
                 .timeWindowAll(Time.minutes(5L))
                 .sum(1)
                 .print()
+                .name("sink: print")
 
         val sinkHBase = fliter.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(1000)) {override def extractTimestamp(entity: PVEvent.Entity): Long = entity.getEventTimeMs})
             .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, if(!StringUtils.isNullOrWhitespaceOnly(event.getImei)) event.getImei else event.getIdfa))
@@ -57,6 +58,7 @@ object FlinkKafkaExample {
             .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name, e1.deviceId))
             .uid("reduce app_key operator")
             .writeUsingOutputFormat(new HBaseOutputFormat())
+            .name("sink hbase")
 
         env.execute("local-cluster-flink-kafka-test")
     }
