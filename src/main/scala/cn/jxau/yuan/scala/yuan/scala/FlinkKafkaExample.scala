@@ -31,26 +31,32 @@ object FlinkKafkaExample {
 
     def main(args: Array[String]): Unit = {
         val kafkaProps = new Properties
-        kafkaProps.setProperty("bootstrap.servers", BOOTSTRAP_SERVERS)
-        kafkaProps.setProperty("group.id", "flink-01")
+        kafkaProps.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS)
+        kafkaProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "flink-01")
 
         val env = StreamExecutionEnvironment.getExecutionEnvironment
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
         env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
-        env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
+        val fliter = env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
             .setParallelism(2)
             .uid("pv-event-kafka-source")
             .filter(event => event != null && event.getNginxTimeMs > 1527584646000L)
             .uid("filter null pv-event")
-            .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(1000)) {override def extractTimestamp(entity: PVEvent.Entity): Long = entity.getEventTimeMs})
+
+        val windowCount = fliter.map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, if(!StringUtils.isNullOrWhitespaceOnly(event.getImei)) event.getImei else event.getIdfa))
+                .uid("map pv-event to case class")
+                .timeWindowAll(Time.minutes(5L))
+                .sum(1)
+                .print()
+
+        val sinkHBase = fliter.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(1000)) {override def extractTimestamp(entity: PVEvent.Entity): Long = entity.getEventTimeMs})
             .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, if(!StringUtils.isNullOrWhitespaceOnly(event.getImei)) event.getImei else event.getIdfa))
-            .uid("map pv-event to case class")
+            .uid("sink hbase flow map pv-event to case class")
             .timeWindowAll(Time.minutes(5))
             .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name, e1.deviceId))
             .uid("reduce app_key operator")
-                .print()
-//            .writeUsingOutputFormat(new HBaseOutputFormat())
+            .writeUsingOutputFormat(new HBaseOutputFormat())
 
         env.execute("local-cluster-flink-kafka-test")
     }
