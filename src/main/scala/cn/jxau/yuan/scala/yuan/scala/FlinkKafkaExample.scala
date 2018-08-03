@@ -39,7 +39,7 @@ object FlinkKafkaExample {
         env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
         val fliter = env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
-            .setParallelism(2)
+            .setParallelism(1)
             .uid("pv-event-kafka-source")
             .filter(event => event != null && event.getNginxTimeMs > 1527584646000L)
             .uid("filter null pv-event")
