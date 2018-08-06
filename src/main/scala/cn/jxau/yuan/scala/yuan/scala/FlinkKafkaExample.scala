@@ -55,9 +55,6 @@ object FlinkKafkaExample {
         filter.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(1000)) {override def extractTimestamp(entity: PVEvent.Entity): Long = entity.getEventTimeMs})
             .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, event.getEventId))
             .uid("sink hbase flow map pv-event to case class")
-            .timeWindowAll(Time.minutes(5))
-            .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name, e1.eventId))
-            .uid("reduce app_key operator")
             .writeUsingOutputFormat(new HBaseOutputFormat())
             .name("sink hbase")
 
