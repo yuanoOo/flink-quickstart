@@ -10,12 +10,11 @@ import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrderness
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer010, FlinkKafkaConsumer011}
-import org.apache.flink.util.StringUtils
-import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.{HTable, Put}
 import org.apache.hadoop.hbase.util.Bytes
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.slf4j.LoggerFactory
 import suishen.message.event.define.PVEvent
 
@@ -38,24 +37,26 @@ object FlinkKafkaExample {
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
         env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
-        val fliter = env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
+        val filter = env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
             .setParallelism(1)
             .uid("pv-event-kafka-source")
             .filter(event => event != null && event.getNginxTimeMs > 1527584646000L)
             .uid("filter null pv-event")
 
-        val windowCount = fliter.map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, if(!StringUtils.isNullOrWhitespaceOnly(event.getImei)) event.getImei else event.getIdfa))
+        // window count
+        filter.map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, event.getEventId))
                 .uid("map pv-event to case class")
                 .timeWindowAll(Time.minutes(5L))
                 .sum(1)
                 .print()
                 .name("sink: print")
 
-        val sinkHBase = fliter.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(1000)) {override def extractTimestamp(entity: PVEvent.Entity): Long = entity.getEventTimeMs})
-            .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, if(!StringUtils.isNullOrWhitespaceOnly(event.getImei)) event.getImei else event.getIdfa))
+        // hbase sink
+        filter.assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[PVEvent.Entity](Time.milliseconds(1000)) {override def extractTimestamp(entity: PVEvent.Entity): Long = entity.getEventTimeMs})
+            .map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, event.getEventId))
             .uid("sink hbase flow map pv-event to case class")
             .timeWindowAll(Time.minutes(5))
-            .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name, e1.deviceId))
+            .reduce((e1, e2) => PvEvent(e1.time, e1.appKey + e2.appKey, e1.name, e1.eventId))
             .uid("reduce app_key operator")
             .writeUsingOutputFormat(new HBaseOutputFormat())
             .name("sink hbase")
@@ -70,7 +71,7 @@ object FlinkKafkaExample {
       * @param appKey
       * @param name
       */
-    case class PvEvent(time: Long, appKey: Long, name: String, deviceId: String)
+    case class PvEvent(time: Long, appKey: Long, name: String, eventId: String)
 
     /**
       * This class implements an OutputFormat for HBase.
@@ -98,11 +99,12 @@ object FlinkKafkaExample {
 
         @throws[IOException]
         override def writeRecord(record: PvEvent): Unit = {
-            val put = new Put(Bytes.toBytes(record.appKey + record.deviceId))
+            println("device_id ===>", record.eventId)
+            val put = new Put(Bytes.toBytes(record.eventId))
             put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("time"), Bytes.toBytes(record.time))
             put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("app_key"), Bytes.toBytes(record.appKey))
             put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("name"), Bytes.toBytes(record.name))
-            put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("device_id"), Bytes.toBytes(record.deviceId))
+            put.addColumn(Bytes.toBytes("T"), Bytes.toBytes("device_id"), Bytes.toBytes(record.eventId))
             rowNumber += 1
             table.put(put)
         }
