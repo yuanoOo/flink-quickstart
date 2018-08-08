@@ -59,6 +59,14 @@ public class AsyncIOExample {
 	private static final String ORDERED = "ordered";
 
 	/**
+     * 支持ListCheckpoint的source
+     *
+     * Stateful sources require a bit more care as opposed to other operators.
+     * In order to make the updates to the state and output collection atomic (required for exactly-once semantics on failure/recovery),
+     * the user is required to get a lock from the source’s context.
+     *
+     *  与其他operator相比, stateful source需要更多的关注。为了使状态和输出集合的更新成为原子（在故障/恢复时精确一次的语义所需），
+     *  用户需要从源的上下文中获取 a lock。
 	 * A checkpointed source.
 	 */
 	private static class SimpleSource implements SourceFunction<Integer>, ListCheckpointed<Integer> {
@@ -68,11 +76,13 @@ public class AsyncIOExample {
 		private int counter = 0;
 		private int start = 0;
 
+		// 快照状态
 		@Override
 		public List<Integer> snapshotState(long checkpointId, long timestamp) throws Exception {
 			return Collections.singletonList(start);
 		}
 
+		// 恢复快照
 		@Override
 		public void restoreState(List<Integer> state) throws Exception {
 			for (Integer i : state) {
@@ -239,7 +249,8 @@ public class AsyncIOExample {
 		LOG.info(configStringBuilder.toString());
 
 
-		// 设置check point
+		// 设置状态存储后端,从具体的实现类来看有:FsStateBackend和MemoryStateBackend
+        // 分别对应于文件系统和内存状态持久化
 		if (statePath != null) {
 			// setup state and checkpoint mode
 			env.setStateBackend(new FsStateBackend(statePath));
@@ -253,6 +264,7 @@ public class AsyncIOExample {
 		}
 
 		// enable watermark or not
+        // 只有eventTime才会开启WaterMark的功能,对于摄入时间,系统内部会自动维护,而处理时间完全不需要
 		if (EVENT_TIME.equals(timeType)) {
 			env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 		}
