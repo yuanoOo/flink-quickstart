@@ -1,10 +1,15 @@
 package cn.jxau.yuan.scala.yuan.java.state.app;
 
 import cn.jxau.yuan.scala.yuan.java.state.function.CountWithOperatorState;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.CoreOptions;
+import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * operator stat example
@@ -12,13 +17,21 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
  */
 public class OperatorStateMain {
 
+    private static final Logger LOG = LoggerFactory.getLogger(OperatorStateMain.class);
+
     public static void main(String argsp[]) throws Exception {
 
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        // IDE中启用状态后端
+        Configuration conf = new Configuration();
+        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint");
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
-        // 设置checkpoint
+        // 设置checkpoint, checkpoint之间的周期为60000ms
         env.enableCheckpointing(60000);
+
+        // 这里配置的状态存储后端会覆盖flink-conf.yaml中相应的配置
+        env.setStateBackend(new FsStateBackend("file:///home/yuan/test/checkpoint/1"));
         CheckpointConfig checkpointConf = env.getCheckpointConfig();
 
         /**
@@ -37,20 +50,22 @@ public class OperatorStateMain {
 
         /**
          * Enables checkpoints to be persisted externally
-         * 允许检查点在外部持久化, 同时设置为及时job被cancel,也保留checkpoint的策略
+         * 允许检查点在外部持久化, 同时设置为即使job被cancel,也保留checkpoint的策略
          */
         checkpointConf.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
 
 
         env.fromElements(1L, 2L, 3L, 4L, 5L, 1L, 3L, 4L, 5L, 6L, 7L, 1L, 4L, 5L, 3L, 9L, 9L, 2L, 1L)
                 .flatMap(new CountWithOperatorState())
+                .setParallelism(2)
                 .addSink(new SinkFunction<String>() {
                     @Override
                     public void invoke(String s) throws Exception {
-
+                        LOG.warn(Thread.currentThread().getName() + "===>" + s);
                     }
                 });
 
+        env.execute();
     }
 
 }
