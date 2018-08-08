@@ -6,7 +6,10 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 
-
+/**
+ * operator stat example
+ * 对比与keyed state
+ */
 public class OperatorStateMain {
 
     public static void main(String argsp[]) throws Exception {
@@ -31,6 +34,11 @@ public class OperatorStateMain {
         checkpointConf.setMinPauseBetweenCheckpoints(30000L);
         // checkpoint超时时间, with milliseconds
         checkpointConf.setCheckpointTimeout(10000L);
+
+        /**
+         * Enables checkpoints to be persisted externally
+         * 允许检查点在外部持久化, 同时设置为及时job被cancel,也保留checkpoint的策略
+         */
         checkpointConf.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
 
 

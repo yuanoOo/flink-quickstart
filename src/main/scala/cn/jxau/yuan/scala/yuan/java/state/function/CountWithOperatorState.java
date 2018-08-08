@@ -24,10 +24,17 @@ import java.util.List;
  *          5     3 4 5 6 7
  *          8     4 5 3 9 9 2
  *
+ *
+ *   ###############
+ *   在该例子中, 实现了一个有状态的FlatMapFunction, 并展示了如何对状态进行操作
+ *
  */
 public class CountWithOperatorState extends RichFlatMapFunction<Long,String> implements CheckpointedFunction {
-    /*
-     *  保存结果状态
+
+    /**
+     * 保存结果状态
+     * ListState<>:本身就是一个List,但是其可以被托管给Flink,进行状态的checkpoint,failover
+     * 和JDK中的List进行对比
      */
     private transient ListState<Long>  checkPointCountList;
     private List<Long> listBufferElements;
