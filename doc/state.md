@@ -26,7 +26,7 @@ All datastream functions can use managed state, but the raw state interfaces can
 Using managed state (rather than raw state) is recommended, since with managed state Flink is able to automatically 
 redistribute state when the parallelism is changed, and also do better memory management.
 
-### state
+### operator state
 
 ### keyed state
 

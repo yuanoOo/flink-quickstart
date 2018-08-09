@@ -75,7 +75,8 @@ public class CountWithOperatorState extends RichFlatMapFunction<Long, String> im
     }
 
     /**
-     * 初始化状态,从context中获取Flink Manager State
+     * 1, 初始化状态,从context中获取Flink Manager State
+     * 2, 进行restore相关的操作
      *
      * @param functionInitializationContext
      * @throws Exception
@@ -83,11 +84,10 @@ public class CountWithOperatorState extends RichFlatMapFunction<Long, String> im
     @Override
     public void initializeState(FunctionInitializationContext functionInitializationContext) throws Exception {
         ListStateDescriptor<Long> listStateDescriptor =
-                new ListStateDescriptor<Long>(
-                        "listForThree",
-                        TypeInformation.of(new TypeHint<Long>() {}));
+                new ListStateDescriptor<>("listForThree", TypeInformation.of(new TypeHint<Long>() {}));
 
         checkPointCountList = functionInitializationContext.getOperatorStateStore().getListState(listStateDescriptor);
+        // 进行状态恢复
         if (functionInitializationContext.isRestored()) {
             for (Long element : checkPointCountList.get()) {
                 listBufferElements.add(element);
