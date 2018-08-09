@@ -67,7 +67,7 @@ public class AsyncIOExample {
      *
      *  与其他operator相比, stateful source需要更多的关注。为了使状态和输出集合的更新成为原子（在故障/恢复时精确一次的语义所需），
      *  用户需要从源的上下文中获取 a lock。
-	 * A checkpointed source.
+	 *  A checkpointed source.
 	 */
 	private static class SimpleSource implements SourceFunction<Integer>, ListCheckpointed<Integer> {
 		private static final long serialVersionUID = 1L;
@@ -76,15 +76,16 @@ public class AsyncIOExample {
 		private int counter = 0;
 		private int start = 0;
 
-		// 快照状态
+		// Gets the current state of the function.
 		@Override
-		public List<Integer> snapshotState(long checkpointId, long timestamp) throws Exception {
+		public List<Integer> snapshotState(long checkpointId, long timestamp) {
+			// 返回一个只含有一个元素的List
 			return Collections.singletonList(start);
 		}
 
-		// 恢复快照
+		// This method is invoked when the function is executed after a failure recovery.
 		@Override
-		public void restoreState(List<Integer> state) throws Exception {
+		public void restoreState(List<Integer> state) {
 			for (Integer i : state) {
 				this.start = i;
 			}
@@ -303,7 +304,7 @@ public class AsyncIOExample {
 			private static final long serialVersionUID = -938116068682344455L;
 
 			@Override
-			public void flatMap(String value, Collector<Tuple2<String, Integer>> out) throws Exception {
+			public void flatMap(String value, Collector<Tuple2<String, Integer>> out) {
 				out.collect(new Tuple2<>(value, 1));
 			}
 		}).keyBy(0).sum(1).print();

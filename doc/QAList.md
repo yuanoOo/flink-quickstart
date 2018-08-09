@@ -35,3 +35,7 @@
 	 * @param parallelism The parallelism
 	 */
 ```
+
+- 3,Keyed State是如何被组织成Key Groups的,为什么说Key Groups是Flink可以重新分配Key State的原子单元
+  - Keyed State is further organized into so-called Key Groups. Key Groups are the atomic unit by which Flink can redistribute Keyed State;
+    Keyed State进一步被组织成所谓的Key Groups(**被如何组织的?**)。Key Groups是Flink可以重新分配Key State的原子单元
