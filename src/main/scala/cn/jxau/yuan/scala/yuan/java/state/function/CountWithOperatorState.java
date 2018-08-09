@@ -84,7 +84,8 @@ public class CountWithOperatorState extends RichFlatMapFunction<Long, String> im
     @Override
     public void initializeState(FunctionInitializationContext functionInitializationContext) throws Exception {
         ListStateDescriptor<Long> listStateDescriptor =
-                new ListStateDescriptor<>("listForThree", TypeInformation.of(new TypeHint<Long>() {}));
+                new ListStateDescriptor<>("listForThree", //该状态对应的名字
+                        TypeInformation.of(new TypeHint<Long>() {}));
 
         checkPointCountList = functionInitializationContext.getOperatorStateStore().getListState(listStateDescriptor);
         // 进行状态恢复

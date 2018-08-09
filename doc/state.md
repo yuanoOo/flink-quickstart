@@ -30,6 +30,8 @@ redistribute state when the parallelism is changed, and also do better memory ma
 
 ### keyed state
 
+### Queryable State
+
 ### 有状态函数
 
 ### 无状态函数

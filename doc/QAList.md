@@ -14,3 +14,24 @@
      */
     checkpointConf.setMinPauseBetweenCheckpoints(30000L);
 ```
+
+- 2,flink operator默认并行度是如何产生的
+
+  - 下面这段注释会给出一些信息
+    - 默认的并行度x,会导致所有operators都会以x的并行度运行(x个subTask)
+      - Setting a parallelism of x here will cause all operators (such as map, batchReduce) to run with x parallel instances.
+    - {@link LocalStreamEnvironment} uses by default a value equal to the number of hardware contexts (CPU cores / threads).
+```
+	/**
+	 * Sets the parallelism for operations executed through this environment.
+	 * Setting a parallelism of x here will cause all operators (such as map,
+	 * batchReduce) to run with x parallel instances. This method overrides the
+	 * default parallelism for this environment. The
+	 * {@link LocalStreamEnvironment} uses by default a value equal to the
+	 * number of hardware contexts (CPU cores / threads). When executing the
+	 * program via the command line client from a JAR file, the default degree
+	 * of parallelism is the one configured for that setup.
+	 *
+	 * @param parallelism The parallelism
+	 */
+```
