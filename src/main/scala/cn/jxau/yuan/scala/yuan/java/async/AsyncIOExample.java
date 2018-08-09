@@ -48,6 +48,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Example to illustrates how to use {@link AsyncFunction}.
+ *
+ * 异步IO:
+ *     ORDERED
+ *     UNORDERED
  */
 public class AsyncIOExample {
 
@@ -119,11 +123,11 @@ public class AsyncIOExample {
 
 
 	/**
-	 * An sample of {@link AsyncFunction} using a thread pool and executing working threads
-	 * to simulate multiple async operations.
+	 * An sample of {@link AsyncFunction} using a thread pool and executing working threads to simulate multiple async operations.
+	 * 使用线程池并执行工作线程来模拟多个异步操作的{@link AsyncFunction}示例。
 	 *
-	 * <p>For the real use case in production environment, the thread pool may stay in the
-	 * async client.
+	 * <p>For the real use case in production environment, the thread pool may stay in the async client.
+	 *   对于生产环境中的实际用例，线程池可能保留在异步客户端中
 	 */
 	private static class SampleAsyncFunction extends RichAsyncFunction<Integer, String> {
 		private static final long serialVersionUID = 2098635244857937717L;
@@ -131,14 +135,14 @@ public class AsyncIOExample {
 		private transient ExecutorService executorService;
 
 		/**
-		 * The result of multiplying sleepFactor with a random float is used to pause
-		 * the working thread in the thread pool, simulating a time consuming async operation.
+		 * The result of multiplying sleepFactor with a random float is used to pause the working thread in the thread pool, simulating a time consuming async operation.
+		 * 将sleepFactor与a random float相乘的结果用于暂停线程池中的工作线程，模拟耗时的异步操作。
 		 */
 		private final long sleepFactor;
 
 		/**
-		 * The ratio to generate an exception to simulate an async error. For example, the error
-		 * may be a TimeoutException while visiting HBase.
+		 * The ratio to generate an exception to simulate an async error. For example, the error may be a TimeoutException while visiting HBase.
+		 * 生成异常以模拟async error的比率。例如，访问HBase时，错误可能是TimeoutException。
 		 */
 		private final float failRatio;
 
@@ -165,6 +169,8 @@ public class AsyncIOExample {
 
 		@Override
 		public void asyncInvoke(final Integer input, final ResultFuture<String> resultFuture) {
+
+			// 利用线程池模拟对个异步操作
 			executorService.submit(() -> {
 				// wait for while to simulate async operation here
 				long sleep = (long) (ThreadLocalRandom.current().nextFloat() * sleepFactor);
@@ -174,8 +180,8 @@ public class AsyncIOExample {
 					if (ThreadLocalRandom.current().nextFloat() < failRatio) {
 						resultFuture.completeExceptionally(new Exception("wahahahaha..."));
 					} else {
-						resultFuture.complete(
-							Collections.singletonList("key-" + (input % 10)));
+						// 将异步客户端返回的结果保存在ResultFuture中, 结果会被自然的传递给下游的operator
+						resultFuture.complete(Collections.singletonList("key-" + (input % 10)));
 					}
 				} catch (InterruptedException e) {
 					resultFuture.complete(new ArrayList<>(0));
@@ -250,7 +256,7 @@ public class AsyncIOExample {
 		LOG.info(configStringBuilder.toString());
 
 
-		// 设置状态存储后端,从具体的实现类来看有:FsStateBackend和MemoryStateBackend
+		// 设置状态存储后端,从具体的实现类来看有:FsStateBackend和MemoryStateBackend,还有一个RocketDB,需要添加依赖
         // 分别对应于文件系统和内存状态持久化
 		if (statePath != null) {
 			// setup state and checkpoint mode
@@ -299,7 +305,7 @@ public class AsyncIOExample {
 				20).setParallelism(taskNum);
 		}
 
-		// add a reduce to get the sum of each keys.
+		// add a reduce to get the sum of each keys.(WordCount)
 		result.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
 			private static final long serialVersionUID = -938116068682344455L;
 
