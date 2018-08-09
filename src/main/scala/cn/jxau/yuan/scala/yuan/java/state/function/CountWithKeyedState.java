@@ -48,7 +48,7 @@ public class CountWithKeyedState extends RichFlatMapFunction<Tuple2<Long, Long>,
         // 查看每个线程收到的input tuple
         LOG.warn(Thread.currentThread().getName() + "==>" + input.toString());
 
-        // if the count reaches 2, emit the average and clear the state
+        // if the count reaches 3, emit the average and clear the state
         if (currentSum.f0 >= 3) {
             LOG.warn(new Tuple2<>(currentSum.f0, currentSum.f1 / currentSum.f0).toString());
             out.collect(new Tuple2<>(input.f0, currentSum.f1 / currentSum.f0));

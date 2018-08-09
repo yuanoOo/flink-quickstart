@@ -1,4 +1,4 @@
-package cn.jxau.yuan.scala.yuan.java;
+package cn.jxau.yuan.scala.yuan.java.sink;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
