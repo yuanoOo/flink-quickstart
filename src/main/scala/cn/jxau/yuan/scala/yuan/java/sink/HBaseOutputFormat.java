@@ -15,11 +15,11 @@ public class HBaseOutputFormat {
     private final static String TOPIC = "flink-01";
     private final static String BOOTSTRAP_SERVERS = "node104.bigdata.dmp.local.com:9092,node105.bigdata.dmp.local.com:9092,node106.bigdata.dmp.local.com:9092";
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         runConsumer();
     }
 
-    static void runConsumer() throws InterruptedException {
+    static void runConsumer() {
         final Consumer<Long, String> consumer = createConsumer();
         final int giveUp = 100;
         int noRecordsCount = 0;
