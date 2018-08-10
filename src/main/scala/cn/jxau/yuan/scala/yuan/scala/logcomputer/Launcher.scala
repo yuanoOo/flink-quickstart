@@ -15,6 +15,8 @@ import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer010, FlinkKafkaProducer010}
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.producer.ProducerConfig
 
 
 object Launcher {
@@ -44,8 +46,8 @@ object Launcher {
 
     /* Kafka consumer */
     val consumerProps = new Properties()
-    consumerProps.setProperty(KEY_BOOTSTRAP_SERVERS, args(0))
-    consumerProps.setProperty(KEY_GROUP_ID, args(1))
+    consumerProps.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, args(0))
+    consumerProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, args(1))
     val consumer = new FlinkKafkaConsumer010[LogEvent](
       args(2),
       new LogEventDeserializationSchema,
@@ -53,9 +55,9 @@ object Launcher {
     )
 
     val producerProps = new Properties()
-    producerProps.setProperty(KEY_BOOTSTRAP_SERVERS, args(0))
-
-    producerProps.setProperty(KEY_RETRIES, args(3))
+    producerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, args(0))
+    // 配置重试次数
+    producerProps.setProperty(ProducerConfig.RETRIES_CONFIG, args(3))
     val producer =new FlinkKafkaProducer010[ComputeResult](
       args(4),
       new ComputeResultSerializeSchema(args(4)),
@@ -71,6 +73,14 @@ object Launcher {
       * fail (and enter recovery).
       */
     producer.setLogFailuresOnly(false)
+
+    /**
+      * If set to true, the Flink producer will wait for all outstanding messages in the Kafka buffers
+      * to be acknowledged by the Kafka producer on a checkpoint.
+      * This way, the producer can guarantee that messages in the Kafka buffers are part of the checkpoint.
+      *
+      * flush Flag indicating the flushing mode (true = flush on checkpoint)
+      */
     producer.setFlushOnCheckpoint(true)
 
       /*confStream **/
