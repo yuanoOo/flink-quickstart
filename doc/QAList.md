@@ -39,3 +39,10 @@
 - 3,Keyed State是如何被组织成Key Groups的,为什么说Key Groups是Flink可以重新分配Key State的原子单元
   - Keyed State is further organized into so-called Key Groups. Key Groups are the atomic unit by which Flink can redistribute Keyed State;
     Keyed State进一步被组织成所谓的Key Groups(**被如何组织的?**)。Key Groups是Flink可以重新分配Key State的原子单元
+    
+- 4,在Flink Async I/O中,推荐使用directExecutor
+  - 在Async I/O的官方scala demo中, 使用的是directExecutor, 但是现在对directExecutor还是不理解.
+  
+  - For implementations with Futures that have an Executor (or ExecutionContext in Scala) for callbacks, 
+    we suggests to use a DirectExecutor, because the callback typically does minimal work, and a DirectExecutor avoids an additional thread-to-thread handover overhead. 
+    对于具有执行器(或Scala中的ExecutionContext)回调的Future实现，我们建议使用DirectExecutor，因为回调通常只做很少的工作，而DirectExecutor避免了额外的线程到线程的切换开销。

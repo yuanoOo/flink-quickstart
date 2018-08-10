@@ -4,6 +4,7 @@ package cn.jxau.yuan.scala.yuan.java.async;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.runtime.concurrent.Executors;
 import org.apache.flink.streaming.api.functions.async.ResultFuture;
 import org.apache.flink.streaming.api.functions.async.RichAsyncFunction;
 
@@ -42,8 +43,8 @@ class AsyncDatabaseRequest extends RichAsyncFunction<String, Tuple2<String, Stri
         // issue the asynchronous request, receive a future for result
         final Future<String> result = client.query(key);
 
-        // set the callback to be executed once the request by the client is complete
-        // the callback simply forwards the result to the result future
+        // set the callback to be executed once the request by the client is complete the callback simply forwards the result to the result future
+        // 设置一旦客户端的请求完成后执行回调，回调只是将结果转发给result future
         CompletableFuture.supplyAsync(() -> {
             try {
                 return result.get();
