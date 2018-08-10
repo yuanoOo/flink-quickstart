@@ -1,7 +1,6 @@
 package cn.jxau.yuan.scala.yuan.scala.logcomputer.util
 
 import com.roundeights.hasher.Algo
-import cn.jxau.yuan.scala.yuan.scala.logcomputer.constants.Constants._
 
 /**
   * Created by luojiangyu on 3/18/18.

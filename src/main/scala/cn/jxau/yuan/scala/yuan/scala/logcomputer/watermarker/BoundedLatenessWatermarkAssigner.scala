@@ -5,9 +5,6 @@ import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks
 import org.apache.flink.streaming.api.watermark.Watermark
 import cn.jxau.yuan.scala.yuan.scala.logcomputer.constants.Constants._
 
-/**
-  * Created by luojiangyu on 3/18/18.
-  */
 class BoundedLatenessWatermarkAssigner(allowLateness: Int) extends AssignerWithPeriodicWatermarks[ComputeResult] {
   private var maxTimestamp = -1L
 
