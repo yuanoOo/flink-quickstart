@@ -54,13 +54,22 @@ object Launcher {
 
     val producerProps = new Properties()
     producerProps.setProperty(KEY_BOOTSTRAP_SERVERS, args(0))
+
     producerProps.setProperty(KEY_RETRIES, args(3))
     val producer =new FlinkKafkaProducer010[ComputeResult](
       args(4),
       new ComputeResultSerializeSchema(args(4)),
       producerProps
     )
-    /* at_ least_once 设置 */
+
+    /**
+      * at_ least_once 设置
+      *
+      * Defines whether the producer should fail on errors, or only log them.
+      * If this is set to true, then exceptions will be only logged, if set to false,
+      * exceptions will be eventually thrown and cause the streaming program to
+      * fail (and enter recovery).
+      */
     producer.setLogFailuresOnly(false)
     producer.setFlushOnCheckpoint(true)
 
