@@ -1,5 +1,4 @@
-### 
-
+###
 - 1. org.apache.flink.api.common.functions.RuntimeContext
   - A RuntimeContext contains information about the context in which functions are executed. 
     RuntimeContext包含有关执行函数的上下文的信息。
