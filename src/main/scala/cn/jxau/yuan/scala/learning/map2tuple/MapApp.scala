@@ -6,8 +6,6 @@ import scala.collection.JavaConversions.mapAsScalaMap
 
 /**
   * @author zhaomingyuan
-  * @date 18-6-15
-  * @time 上午10:49
   */
 object MapApp {
     def main(args: Array[String]): Unit = {

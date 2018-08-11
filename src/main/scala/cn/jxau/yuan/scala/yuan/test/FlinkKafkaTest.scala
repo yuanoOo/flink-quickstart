@@ -1,13 +1,8 @@
 package cn.jxau.yuan.scala.yuan.test
 
 import java.util.Properties
-
-import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
+//import suishen.message.event.define.PVEvent
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
-import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer010, FlinkKafkaConsumer011}
-import suishen.message.event.define.PVEvent
-import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 
 
 /**
@@ -27,15 +22,15 @@ object FlinkKafkaTest {
 //        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 //        env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
-        env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event",
-            new AbstractDeserializationSchema[PVEvent.Entity] {
-                override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message)
-            }, kafkaProps).setStartFromEarliest())
-                        .filter(e => {
-                            println(e)
-                            1 == 1
-                        })
-                .print()
+        //        env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event",
+        //            new AbstractDeserializationSchema[PVEvent.Entity] {
+        //                override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message)
+        //            }, kafkaProps).setStartFromEarliest())
+        //                        .filter(e => {
+        //                            println(e)
+        //                            1 == 1
+        //                        })
+        //                .print()
 
         env.execute("local")
     }

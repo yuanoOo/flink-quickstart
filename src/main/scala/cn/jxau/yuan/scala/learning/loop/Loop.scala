@@ -2,8 +2,6 @@ package cn.jxau.yuan.scala.learning.loop
 
 /**
   * @author zhaomingyuan
-  * @date 18-7-3
-  * @time 下午4:54
   */
 object Loop {
 

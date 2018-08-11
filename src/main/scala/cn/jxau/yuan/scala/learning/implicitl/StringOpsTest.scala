@@ -2,11 +2,10 @@ package cn.jxau.yuan.scala.learning.implicitl
 
 /**
   * @author zhaomingyuan
-  * @date 18-8-10
-  * @time 下午6:14
+  * @since 2018.09.12
   */
-
 object StringOpsTest extends App {
+
     // 定义打印操作Trait
     trait PrintOps {
         val value: String
