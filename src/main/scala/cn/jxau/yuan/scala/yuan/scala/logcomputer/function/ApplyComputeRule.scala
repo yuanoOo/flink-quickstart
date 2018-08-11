@@ -1,11 +1,10 @@
 package cn.jxau.yuan.scala.yuan.scala.logcomputer.function
 
 import cn.jxau.yuan.scala.yuan.scala.logcomputer.bean.{ComputeConf, ComputeResult, LogEvent}
+import cn.jxau.yuan.scala.yuan.scala.logcomputer.constants.Constants._
 import cn.jxau.yuan.scala.yuan.scala.logcomputer.util.KeyUtil
 import org.apache.flink.streaming.api.functions.co.CoFlatMapFunction
 import org.apache.flink.util.Collector
-import cn.jxau.yuan.scala.yuan.scala.logcomputer.constants.Constants._
-
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -23,6 +22,7 @@ class ApplyComputeRule extends CoFlatMapFunction[LogEvent, ComputeConf, ComputeR
     applyConfToLog(logEvent, computeConf).foreach(collector.collect)
   }
 
+  // 应用规则
   def applyConfToLog(logEvent: LogEvent, computeConf: ComputeConf): ArrayBuffer[ComputeResult] = {
     var array = mutable.ArrayBuffer[ComputeResult]()
     computeConf.data.foreach(rule => {

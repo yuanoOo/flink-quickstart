@@ -3,11 +3,11 @@ package cn.jxau.yuan.scala.yuan.scala.logcomputer
 import java.util.Properties
 
 import cn.jxau.yuan.scala.yuan.scala.logcomputer.bean.{ComputeResult, LogEvent}
+import cn.jxau.yuan.scala.yuan.scala.logcomputer.constants.Constants._
 import cn.jxau.yuan.scala.yuan.scala.logcomputer.function.{AggregateFunc, ApplyComputeRule}
 import cn.jxau.yuan.scala.yuan.scala.logcomputer.schema.{ComputeResultSerializeSchema, LogEventDeserializationSchema}
 import cn.jxau.yuan.scala.yuan.scala.logcomputer.source.ConfSource
 import cn.jxau.yuan.scala.yuan.scala.logcomputer.watermarker.BoundedLatenessWatermarkAssigner
-import cn.jxau.yuan.scala.yuan.scala.logcomputer.constants.Constants._
 import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.environment.CheckpointConfig.ExternalizedCheckpointCleanup
@@ -86,6 +86,8 @@ object Launcher {
       /*confStream **/
     val confStream = env.addSource(new ConfSource(args(5)))
       .setParallelism(1)
+        // Sets the partitioning of the DataStream so that the output tuples are broad casted to every parallel instance of the next component.
+        // 将配置流广播给每一个并行实例
       .broadcast
 
 

@@ -46,3 +46,6 @@
   - For implementations with Futures that have an Executor (or ExecutionContext in Scala) for callbacks, 
     we suggests to use a DirectExecutor, because the callback typically does minimal work, and a DirectExecutor avoids an additional thread-to-thread handover overhead. 
     对于具有执行器(或Scala中的ExecutionContext)回调的Future实现，我们建议使用DirectExecutor，因为回调通常只做很少的工作，而DirectExecutor避免了额外的线程到线程的切换开销。
+
+- 5，The Broadcast State Pattern
+  - 好像在实时规则更新中，也没有用到这个，具体应用场景还要再看官方文档确定。
