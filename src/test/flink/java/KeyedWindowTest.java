@@ -13,6 +13,7 @@ public class KeyedWindowTest {
                 .sum(0)
                 .setParallelism(1)
                 .print()
+                .slotSharingGroup("")
                 .setParallelism(1);
 
         env.execute();
