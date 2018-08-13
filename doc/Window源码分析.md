@@ -44,4 +44,90 @@ http://wuchong.me/blog/2016/05/25/flink-internals-window-mechanism/
      ,max()，还有 ReduceFunction，FoldFunction，还有WindowFunction。WindowFunction 是最通用的计算函数
      ，其他的预定义的函数基本都是基于该函数实现的。
 
-### CountWindow
+### CountWindow(三组件的使用典范)
+
+
+```java
+// tumbling count window
+public WindowedStream<T, KEY, GlobalWindow> countWindow(long size) {
+  return window(GlobalWindows.create())  // create window stream using GlobalWindows
+      .trigger(PurgingTrigger.of(CountTrigger.of(size))); // trigger is window size
+}
+// sliding count window
+public WindowedStream<T, KEY, GlobalWindow> countWindow(long size, long slide) {
+  return window(GlobalWindows.create())
+    .evictor(CountEvictor.of(size))  // evictor is window size
+    .trigger(CountTrigger.of(slide)); // trigger is slide size
+}
+```
+
+
+### TimeWindow
+https://blog.csdn.net/lmalds/article/details/51604501
+
+```java
+// tumbling time window
+public WindowedStream<T, KEY, TimeWindow> timeWindow(Time size) {
+  if (environment.getStreamTimeCharacteristic() == TimeCharacteristic.ProcessingTime) {
+    return window(TumblingProcessingTimeWindows.of(size));
+  } else {
+    return window(TumblingEventTimeWindows.of(size));
+  }
+}
+// sliding time window
+public WindowedStream<T, KEY, TimeWindow> timeWindow(Time size, Time slide) {
+  if (environment.getStreamTimeCharacteristic() == TimeCharacteristic.ProcessingTime) {
+    return window(SlidingProcessingTimeWindows.of(size, slide));
+  } else {
+    return window(SlidingEventTimeWindows.of(size, slide));
+  }
+}
+```
+
+- sliding process time window
+```java
+public class SlidingProcessingTimeWindows extends WindowAssigner<Object, TimeWindow> {
+  private static final long serialVersionUID = 1L;
+  private final long size;
+  private final long slide;
+  private SlidingProcessingTimeWindows(long size, long slide) {
+    this.size = size;
+    this.slide = slide;
+  }
+
+  // 为每个元素分配其所属的窗口
+  @Override
+  public Collection<TimeWindow> assignWindows(Object element, long timestamp) {
+    timestamp = System.currentTimeMillis();
+    List<TimeWindow> windows = new ArrayList<>((int) (size / slide));
+
+    // slide：窗口滑动间隔
+    // 对齐时间戳，
+    long lastStart = timestamp - timestamp % slide;
+
+    for (long start = lastStart; start > timestamp - size; start -= slide) {
+      // 当前时间戳对应了多个window
+      windows.add(new TimeWindow(start, start + size));
+    }
+    return windows;
+  }
+  ...
+}
+public class ProcessingTimeTrigger extends Trigger<Object, TimeWindow> {
+  @Override
+  // 每个元素进入窗口都会调用该方法
+  public TriggerResult onElement(Object element, long timestamp, TimeWindow window, TriggerContext ctx) {
+    // 注册定时器，当系统时间到达window end timestamp时会回调该trigger的onProcessingTime方法
+    ctx.registerProcessingTimeTimer(window.getEnd());
+    return TriggerResult.CONTINUE;
+  }
+  @Override
+  // 返回结果表示执行窗口计算并清空窗口
+  public TriggerResult onProcessingTime(long time, TimeWindow window, TriggerContext ctx) {
+    return TriggerResult.FIRE_AND_PURGE;
+  }
+  ...
+}
+```
+
+###
