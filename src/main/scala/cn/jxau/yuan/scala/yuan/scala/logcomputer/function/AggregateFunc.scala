@@ -13,7 +13,10 @@ import scala.collection.mutable
 
 class AggregateFunc extends WindowFunction[ComputeResult, ComputeResult, Tuple, TimeWindow]{
   override def apply(key: Tuple, window: TimeWindow, input: Iterable[ComputeResult], out: Collector[ComputeResult]): Unit = {
+    // 由于keyBy(FIELD_KEY, FIELD_PERIODS), 所以window中的key为Tuple类型
     val periods = key.getField[String](1)
+
+    // 聚合操作
     periods.split(SEP_SEMICOL).foreach((period) => {
       val end = window.getEnd
       val start = end - period.toLong * 1000L
