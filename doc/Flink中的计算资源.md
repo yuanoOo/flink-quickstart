@@ -3,11 +3,16 @@ http://wuchong.me/blog/2016/05/09/flink-internals-understanding-execution-resour
 
 ### 一、Operator Chains
 
-### 二、Task Slot
+### 二、Task Slot(不隔离CPU, 每个TaskManager中的Task Slot共享该TaskManager所有的线程)
 - 1, 为什么要有Task slot
   - TaskManager是一个JVM进程，并会以独立的线程来执行一个task或多个subtask。
     **为了控制一个TaskManager能接受多少个task，Flink提出了Task Slot的概念。**
 
+- 2, 计算资源Task slot
+  - Flink中的计算资源通过Task Slot来定义。每个task slot代表了TaskManager的一个固定大小的资源子集。
+    例如，一个拥有3个slot的 TaskManager，会将其管理的内存平均分成三分分给各个slot。
+    将资源slot化意味着来自不同job的task不会为了内存而竞争，而是每个task都拥有一定数量的内存储备。
+    需要注意的是，**这里不会涉及到CPU的隔离，slot目前仅仅用来隔离task的内存。**
 
 ### 三、SlotSharingGroup(default group: 就是每一条pipeline上的subTasks在一个Slot中)
 - 1、计算一个Flink App需要多少个Slots
