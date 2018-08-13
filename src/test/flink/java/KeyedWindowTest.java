@@ -1,6 +1,7 @@
 package flink.java;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.EventTimeSessionWindows;
 import org.apache.flink.streaming.api.windowing.triggers.PurgingTrigger;
 
 public class KeyedWindowTest {
