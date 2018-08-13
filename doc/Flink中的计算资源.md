@@ -31,7 +31,12 @@ http://wuchong.me/blog/2016/05/09/flink-internals-understanding-execution-resour
 ### 四、CoLocationGroup
 
 
+### 五、原理与实现
+- Slot的组织关系(Slot, SimpleSlot, SharedSlot)
+- Slot(org.apache.flink.runtime.instance.SimpleSlot, org.apache.flink.runtime.instance.SharedSlot)的分配过程
+
+
 ### 总结
-- 最核心的是 Task Slot，每个slot能运行一个或多个task。为了拓扑更高效地运行，Flink提出了Chaining，
+- 最核心的是Task Slot，每个slot能运行一个或多个task。为了拓扑更高效地运行，Flink提出了Chaining，
   尽可能地将operators chain在一起作为一个task来处理。为了资源更充分的利用，Flink又提出了SlotSharingGroup，
   尽可能地让多个task共享一个slot。
