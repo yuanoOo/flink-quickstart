@@ -45,7 +45,7 @@ http://wuchong.me/blog/2016/05/25/flink-internals-window-mechanism/
      ，其他的预定义的函数基本都是基于该函数实现的。
 
 ### CountWindow(三组件的使用典范)
-- 1, 在Count Window中, 无论是翻滚还是滑动窗口,具体实现都不用分配多个窗口
+- 1, 在Count Window中, 无论是翻滚还是滑动窗口,具体实现只需要分配一个Window即可(可复用)
   - 具体原因待描述
 - 2,Slide Time Window需要分配多个窗口
 
@@ -66,9 +66,10 @@ public WindowedStream<T, KEY, GlobalWindow> countWindow(long size, long slide) {
 
 ### TimeWindow
 
-- 需要多少窗口:
+- 每个record需要分配多少窗口(WindowAssigner中的逻辑):
   - 翻滚Time Window: window size为1分钟,则1小时会有60个窗口
-  - 滑动Time Window: window size为1分钟, Slide Size为30秒, 则小时会有60 * (1min/ 30sec)个窗口
+  - 滑动Time Window: window size为1分钟, Slide Size为30秒, 则小时会有60 * (1min/ 30sec)即120个窗口
+                     ,一个record需要分配的窗口数为:window size / slide size
 
 https://blog.csdn.net/lmalds/article/details/51604501
 
@@ -81,6 +82,7 @@ public WindowedStream<T, KEY, TimeWindow> timeWindow(Time size) {
     return window(TumblingEventTimeWindows.of(size));
   }
 }
+
 // sliding time window
 public WindowedStream<T, KEY, TimeWindow> timeWindow(Time size, Time slide) {
   if (environment.getStreamTimeCharacteristic() == TimeCharacteristic.ProcessingTime) {
@@ -106,10 +108,10 @@ public class SlidingProcessingTimeWindows extends WindowAssigner<Object, TimeWin
   @Override
   public Collection<TimeWindow> assignWindows(Object element, long timestamp) {
     timestamp = System.currentTimeMillis();
+    // 每个元素需要分配的窗口,个数:window size / window slide
     List<TimeWindow> windows = new ArrayList<>((int) (size / slide));
 
-    // slide：窗口滑动间隔
-    // 对齐时间戳，
+    // 对齐时间戳, timestamp % slide取余是什么鬼操作 ?需要自己模拟一步步的进行测试
     long lastStart = timestamp - timestamp % slide;
 
     for (long start = lastStart; start > timestamp - size; start -= slide) {
