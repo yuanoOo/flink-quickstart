@@ -20,7 +20,7 @@ http://wuchong.me/blog/2016/05/25/flink-internals-window-mechanism/
 
 ### Window的实现
 ![](pic/window.png)
-- 1、首先上图中的组件都位于一个**算子（window operator）**中，数据流源源不断地进入算子，
+- 1、首先上图中的组件都位于一个 **算子(window operator)** 中，数据流源源不断地进入算子，
      每一个到达的元素都会被交给 WindowAssigner。WindowAssigner 会决定元素被放到哪个
      或哪些窗口（window），可能会创建新窗口。因为一个元素可以被放入多个窗口中，所以
      同时存在多个窗口是可能的。注意，Window本身只是一个ID标识符，其内部可能存储了一
