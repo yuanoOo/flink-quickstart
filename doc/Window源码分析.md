@@ -93,7 +93,7 @@ public WindowedStream<T, KEY, TimeWindow> timeWindow(Time size, Time slide) {
 }
 ```
 
-- sliding process time window
+- sliding process time window(需要自己模拟一步步的进行理解)
 ```java
 public class SlidingProcessingTimeWindows extends WindowAssigner<Object, TimeWindow> {
   private static final long serialVersionUID = 1L;
