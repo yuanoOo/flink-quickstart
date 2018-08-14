@@ -3,7 +3,9 @@
 ### 状态官方文档
 
 ### Dynamic Scaling (动态扩展)
-- Flink中的state是每一个subTask(一个operator有多少并行度,就有多少subTask)都有一个state,需要到"小象"进行复习总结
+https://blog.csdn.net/lmalds/article/details/73457767
+
+- Flink中的state是每一个subTask(一个operator有多少并行度,就有多少subTask)都有一个state
 - 主要体现在:operator的并行度改变时,subTask的state如何redistribute, 并且从而恢复
 - Dynamic Scaling: means the capability to update the operators' parallelism(Flink 1.2), either for keyed state or for non-keyed state.
 - 官方文档对flink1.2新特性的介绍,其中就有:
