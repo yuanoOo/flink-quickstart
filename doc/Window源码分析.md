@@ -45,7 +45,9 @@ http://wuchong.me/blog/2016/05/25/flink-internals-window-mechanism/
      ，其他的预定义的函数基本都是基于该函数实现的。
 
 ### CountWindow(三组件的使用典范)
-
+- 1, 在Count Window中, 无论是翻滚还是滑动窗口,具体实现都不用分配多个窗口
+  - 具体原因待描述
+- 2,Slide Time Window需要分配多个窗口
 
 ```java
 // tumbling count window
@@ -63,6 +65,11 @@ public WindowedStream<T, KEY, GlobalWindow> countWindow(long size, long slide) {
 
 
 ### TimeWindow
+
+- 需要多少窗口:
+  - 翻滚Time Window: window size为1分钟,则1小时会有60个窗口
+  - 滑动Time Window: window size为1分钟, Slide Size为30秒, 则小时会有60 * (1min/ 30sec)个窗口
+
 https://blog.csdn.net/lmalds/article/details/51604501
 
 ```java
