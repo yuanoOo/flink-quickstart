@@ -1,6 +1,6 @@
 # 有状态计算的扩容问题
-https://blog.csdn.net/lmalds/article/details/73457767
-https://data-artisans.com/blog/apache-flink-at-mediamath-rescaling-stateful-applications
+- https://blog.csdn.net/lmalds/article/details/73457767
+- https://data-artisans.com/blog/apache-flink-at-mediamath-rescaling-stateful-applications
 
 # One-click Rescaling with Flink at MediaMath
 
