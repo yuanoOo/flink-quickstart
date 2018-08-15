@@ -21,10 +21,10 @@ package org.myorg.quickstart
 import org.apache.flink.api.scala._
 
 /**
- * Skeleton for a Flink Batch Job.
+ * Skeleton for a Rescaling Stateful Applications.md Batch Job.
  *
- * For a tutorial how to write a Flink batch application, check the
- * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
+ * For a tutorial how to write a Rescaling Stateful Applications.md batch application, check the
+ * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Rescaling Stateful Applications.md Website</a>.
  *
  * To package your appliation into a JAR file for execution,
  * change the main class in the POM.xml file to this class (simply search for 'mainClass')
@@ -37,7 +37,7 @@ object BatchJob {
     val env = ExecutionEnvironment.getExecutionEnvironment
 
     /*
-     * Here, you can start creating your execution plan for Flink.
+     * Here, you can start creating your execution plan for Rescaling Stateful Applications.md.
      *
      * Start with getting some data from the environment, like
      *  env.readTextFile(textPath);
@@ -61,6 +61,6 @@ object BatchJob {
      */
 
     // execute program
-    env.execute("Flink Batch Scala API Skeleton")
+    env.execute("Rescaling Stateful Applications.md Batch Scala API Skeleton")
   }
 }

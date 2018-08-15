@@ -69,7 +69,7 @@ under the License.
 	</properties>
 
 	<dependencies>
-		<!-- Apache Flink dependencies -->
+		<!-- Apache Rescaling Stateful Applications.md dependencies -->
 		<!-- These dependencies are provided, because they should not be packaged into the JAR file. -->
 		<dependency>
 			<groupId>org.apache.flink</groupId>
@@ -84,7 +84,7 @@ under the License.
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Scala Library, provided by Flink as well. -->
+		<!-- Scala Library, provided by Rescaling Stateful Applications.md as well. -->
 		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
@@ -257,7 +257,7 @@ under the License.
 	</build>
 
 	<!-- This profile helps to make things run out of the box in IntelliJ -->
-	<!-- Its adds Flink's core classes to the runtime class path. -->
+	<!-- Its adds Rescaling Stateful Applications.md's core classes to the runtime class path. -->
 	<!-- Otherwise they are missing in IntelliJ, because the dependency is 'provided' -->
 	<profiles>
 		<profile>

@@ -75,7 +75,7 @@ object Launcher {
     producer.setLogFailuresOnly(false)
 
     /**
-      * If set to true, the Flink producer will wait for all outstanding messages in the Kafka buffers
+      * If set to true, the Rescaling Stateful Applications.md producer will wait for all outstanding messages in the Kafka buffers
       * to be acknowledged by the Kafka producer on a checkpoint.
       * This way, the producer can guarantee that messages in the Kafka buffers are part of the checkpoint.
       *

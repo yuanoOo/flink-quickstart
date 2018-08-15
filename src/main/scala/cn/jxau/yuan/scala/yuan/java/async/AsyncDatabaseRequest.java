@@ -1,6 +1,6 @@
 package cn.jxau.yuan.scala.yuan.java.async;
 // This example implements the asynchronous request and callback with Futures that have the
-// interface of Java 8's futures (which is the same one followed by Flink's Future)
+// interface of Java 8's futures (which is the same one followed by Rescaling Stateful Applications.md's Future)
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;

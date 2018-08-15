@@ -23,10 +23,10 @@ import org.apache.flink.core.fs.FileSystem.WriteMode
 import org.apache.flink.streaming.api.scala._
 
 /**
-  * Skeleton for a Flink Streaming Job.
+  * Skeleton for a Rescaling Stateful Applications.md Streaming Job.
   *
-  * For a tutorial how to write a Flink streaming application, check the
-  * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Flink Website</a>.
+  * For a tutorial how to write a Rescaling Stateful Applications.md streaming application, check the
+  * tutorials and examples on the <a href="http://flink.apache.org/docs/stable/">Rescaling Stateful Applications.md Website</a>.
   *
   * To package your appliation into a JAR file for execution, run
   * 'mvn clean package' on the command line.
