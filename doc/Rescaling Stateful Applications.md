@@ -2,12 +2,15 @@
 - https://blog.csdn.net/lmalds/article/details/73457767
 - https://data-artisans.com/blog/apache-flink-at-mediamath-rescaling-stateful-applications
 
-# One-click Rescaling with Flink at MediaMath
-
 # State in Flink and Rescaling Stateful Streaming Jobs
 
 ## An Intro to Stateful Stream Processing
+- At a high level, we can consider state in stream processing as memory in operators
+  that remembers information about past input and can be used to influence the processing
+  of future input.
 
+- This example should demonstrate that state is a fundamental, enabling concept in stream
+  processing that is required for a majority of interesting use cases.
 
 ## State in Apache Flink
 
