@@ -137,18 +137,18 @@ under the License.
 
 		<!-- Add logging framework, to produce console output when running in the IDE. -->
 		<!-- These dependencies are excluded from the application JAR by default. -->
-		<!--<dependency>-->
-			<!--<groupId>org.slf4j</groupId>-->
-			<!--<artifactId>slf4j-log4j12</artifactId>-->
-			<!--<version>1.7.7</version>-->
-			<!--<scope>runtime</scope>-->
-		<!--</dependency>-->
-		<!--<dependency>-->
-			<!--<groupId>log4j</groupId>-->
-			<!--<artifactId>log4j</artifactId>-->
-			<!--<version>1.2.17</version>-->
-			<!--<scope>runtime</scope>-->
-		<!--</dependency>-->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.7</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+			<scope>runtime</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.json4s</groupId>
@@ -180,33 +180,6 @@ under the License.
 			<version>1.2.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>es.accenture</groupId>
-			<artifactId>flink-kudu-connector</artifactId>
-			<version>1.0</version>
-            <exclusions>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>flink-connector-kafka-0.9_2.11</artifactId>
-					<groupId>org.apache.flink</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>flink-java</artifactId>
-					<groupId>org.apache.flink</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 	</dependencies>
 
 	<build>
