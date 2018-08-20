@@ -1,7 +1,7 @@
 package Job;
 
+import Sources.KuduInputFormat;
 import es.accenture.flink.Sources.KuduInputBuilder;
-import es.accenture.flink.Sources.KuduInputFormat;
 import es.accenture.flink.Utils.RowSerializable;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
