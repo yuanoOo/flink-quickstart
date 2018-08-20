@@ -6,12 +6,16 @@ import Sink.KuduSink
 import es.accenture.flink.Utils.RowSerializable
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
+import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer010, FlinkKafkaConsumer011}
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.joda.time
 import suishen.message.event.define.PVEvent
 
 /**
+  * 1、总是报空指针异常，原因暂时不明确
+  *    1、可能版本不正确？
+  *    2、the offical example is java, it has problems ?
+  *
   * @author zhaomingyuan
   * @date 18-8-16
   * @time 下午5:45
@@ -26,7 +30,7 @@ object StreamingKuduSink {
 
         /* Streaming mode - DataSream API - */
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-        env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
+        env.addSource(new FlinkKafkaConsumer010[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
            .map(event => {
                val dateTime = new time.DateTime(event.getNginxTimeMs)
                val nginxDate = dateTime.toString("yyyyMMdd")
