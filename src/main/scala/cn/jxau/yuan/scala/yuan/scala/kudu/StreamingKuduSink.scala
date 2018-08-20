@@ -2,7 +2,7 @@ package cn.jxau.yuan.scala.yuan.scala.kudu
 
 import java.util.{Properties, UUID}
 
-import Sink.KuduSink
+import es.accenture.flink.Sink.KuduSink
 import es.accenture.flink.Utils.RowSerializable
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
 import org.apache.flink.streaming.api.scala._
