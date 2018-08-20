@@ -1,6 +1,5 @@
 package cn.jxau.yuan.scala.yuan.java.sink.kudu;
 
-import es.accenture.flink.Sink.KuduSink;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 

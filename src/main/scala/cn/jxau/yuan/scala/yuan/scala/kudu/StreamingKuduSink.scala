@@ -1,20 +1,19 @@
 package cn.jxau.yuan.scala.yuan.scala.kudu
 
-import java.util.{Properties, UUID}
+import java.util.Properties
 
-import es.accenture.flink.Sink.KuduSink
-import es.accenture.flink.Utils.RowSerializable
+import kudu.batch.KuduOutputFormat
+import kudu.batch.KuduOutputFormat.Conf.WriteMode
+import kudu.stream.KuduSink
+import org.apache.flink.api.java.tuple.Tuple
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer010, FlinkKafkaConsumer011}
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.joda.time
 import suishen.message.event.define.PVEvent
 
 /**
-  * 1、总是报空指针异常，原因暂时不明确
-  *    1、可能版本不正确？
-  *    2、the offical example is java, it has problems ?
+  * kudu connector: https://github.com/0xNacho/bahir-flink/tree/feature/flink-connector-kudu/flink-connector-kudu
   *
   * @author zhaomingyuan
   * @date 18-8-16
@@ -27,87 +26,111 @@ object StreamingKuduSink {
         val kafkaProps = new Properties
         kafkaProps.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS)
         kafkaProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "flink-01")
+        val outputConfig = KuduOutputFormat.Conf
+                   .builder()
+                   .masterAddress("node101.bigdata.dmp.local.com:7051,node102.bigdata.dmp.local.com:7051,node103.bigdata.dmp.local.com:7051")
+                   .tableName("ods_kudu_pv_event_1d")
+                   .writeMode(WriteMode.UPSERT)
+                   .build()
 
         /* Streaming mode - DataSream API - */
         val env = StreamExecutionEnvironment.getExecutionEnvironment
         env.addSource(new FlinkKafkaConsumer010[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
-           .map(event => {
-               val dateTime = new time.DateTime(event.getNginxTimeMs)
-               val nginxDate = dateTime.toString("yyyyMMdd")
-               val nginxHour = dateTime.toString("HH")
-               val rowSerializable = new RowSerializable(100)
-               rowSerializable.setField(0, nginxDate)
-               rowSerializable.setField(1, event.getEventId)
-               rowSerializable.setField(2, nginxHour)
-               rowSerializable.setField(3, event.getNginxTimeMs)
-               rowSerializable.setField(4, event.getAppKey)
-               rowSerializable.setField(5, "device_id" + UUID.randomUUID())
-               rowSerializable.setField(6, event.getPublish)
-               rowSerializable.setField(7, event.getImei)
-               rowSerializable.setField(8, event.getMac)
-               rowSerializable.setField(9, event.getImsi)
-               rowSerializable.setField(10, event.getIdfa)
-               rowSerializable.setField(11, event.getUid)
-               rowSerializable.setField(12, event.getLat)
-               rowSerializable.setField(13, event.getLon)
-               rowSerializable.setField(14, "北京")
-               rowSerializable.setField(15, "北京")
-               rowSerializable.setField(16, event.getCityKey)
-               rowSerializable.setField(17, event.getOs)
-               rowSerializable.setField(18, event.getOsVersion)
-               rowSerializable.setField(19, event.getPkg)
-               rowSerializable.setField(20, event.getAppVersionCode)
-               rowSerializable.setField(21, event.getSdkVersion)
-               rowSerializable.setField(22, event.getAppVersion)
-               rowSerializable.setField(23, "212121")
-               rowSerializable.setField(24, "212121")
-               rowSerializable.setField(25, event.getNetwork)
-               rowSerializable.setField(26, event.getCountry)
-               rowSerializable.setField(27, event.getDeviceSpec)
-               rowSerializable.setField(28, event.getTimeZone)
-               rowSerializable.setField(29, event.getServiceProvider)
-               rowSerializable.setField(30, event.getLanguage)
-               rowSerializable.setField(31, event.getChannel)
-               rowSerializable.setField(32, event.getEvent)
-               rowSerializable.setField(33, event.getEventTimeMs)
-               rowSerializable.setField(34, event.getContentId)
-               rowSerializable.setField(35, event.getContentModel)
-               rowSerializable.setField(36, "cm")
-               rowSerializable.setField(37, "cm")
-               rowSerializable.setField(38, "cm")
-               rowSerializable.setField(39, "cm")
-               rowSerializable.setField(40, "cm")
-               rowSerializable.setField(41, event.getPosition)
-               rowSerializable.setField(42, event.getModule)
-               rowSerializable.setField(43, event.getStartNo)
-               rowSerializable.setField(44, event.getArgs)
-               rowSerializable.setField(45, "arg")
-               rowSerializable.setField(46, "arg")
-               rowSerializable.setField(47, "arg")
-               rowSerializable.setField(48, "arg")
-               rowSerializable.setField(49, "arg")
-               rowSerializable.setField(50, "arg")
-               rowSerializable.setField(51, "arg")
-               rowSerializable.setField(52, "arg")
-               rowSerializable.setField(53, "arg")
-               rowSerializable.setField(54, event.getClientIp)
-               rowSerializable.setField(55, event.getUserAgent)
-               rowSerializable.setField(56, event.getX3D)
-               rowSerializable.setField(57, event.getY3D)
-               rowSerializable.setField(58, event.getZ3D)
-               rowSerializable
-        })
-        .addSink(new KuduSink("node101.bigdata.dmp.local.com:7051,node102.bigdata.dmp.local.com:7051,node103.bigdata.dmp.local.com:7051", "ods_kudu_pv_event_1d",
-               Array("nginx_date", "event_id", "nginx_hour", "nginx_time", "app_key"
-                      , "device_id", "publish", "imei", "mac", "imsi", "idfa", "uid", "lat", "lon"
-                      , "province", "city", "city_key", "os", "os_version", "pkg", "version_code"
-                      , "sdk_version", "app_version", "screen_width", "screen_height", "access_network"
-                      , "country", "device_spec", "time_zone", "sp", "language", "channel", "event_type"
-                      , "event_time", "content_id", "content_model", "project", "p_table", "cm_module", "cm_id"
-                      , "alg_from", "position", "module", "start_num", "args", "card_id"
-                      , "category_id", "topic_id", "circle_id", "remind_id"
-                      , "subject_id", "story_id", "item_id", "section_id", "ip", "user_agent", "x3d", "y3d", "z3d")))
-
+                .map(_ => new org.apache.flink.api.java.tuple.Tuple1[String]("20180101"))
+                .addSink(new KuduSink[org.apache.flink.api.java.tuple.Tuple1[String]](outputConfig))
         env.execute()
+    }
+
+
+   val event2Map = (event: PVEvent.Entity) => {
+
+   }
+
+
+    class Tuple59[T0
+    , T1
+    , T2
+    , T3
+    , T4
+    , T5
+    , T6
+    , T7
+    , T8
+    , T9
+    , T10
+    , T11
+    , T12
+    , T13
+    , T14
+    , T15
+    , T16
+    , T17
+    , T18
+    , T19
+    , T20
+    , T21
+    , T22
+    , T23
+    , T24] extends Tuple{
+        private val serialVersionUID = 1L
+
+        /** Field 0 of the tuple. */
+        var f0: T0 = null
+        /** Field 1 of the tuple. */
+        var f1: T1 = null
+        /** Field 2 of the tuple. */
+        var f2: T2 = null
+        /** Field 3 of the tuple. */
+        var f3: T3 = null
+        /** Field 4 of the tuple. */
+        var f4: T4 = null
+        /** Field 5 of the tuple. */
+        var f5: T5 = null
+        /** Field 6 of the tuple. */
+        var f6: T6 = null
+        /** Field 7 of the tuple. */
+        var f7: T7 = null
+        /** Field 8 of the tuple. */
+        var f8: T8 = null
+        /** Field 9 of the tuple. */
+        var f9: T9 = null
+        /** Field 10 of the tuple. */
+        var f10: T10 = null
+        /** Field 11 of the tuple. */
+        var f11: T11 = null
+        /** Field 12 of the tuple. */
+        var f12: T12 = null
+        /** Field 13 of the tuple. */
+        var f13: T13 = null
+        /** Field 14 of the tuple. */
+        var f14: T14 = null
+        /** Field 15 of the tuple. */
+        var f15: T15 = null
+        /** Field 16 of the tuple. */
+        var f16: T16 = null
+        /** Field 17 of the tuple. */
+        var f17: T17 = null
+        /** Field 18 of the tuple. */
+        var f18: T18 = null
+        /** Field 19 of the tuple. */
+        var f19: T19 = null
+        /** Field 20 of the tuple. */
+        var f20: T20 = null
+        /** Field 21 of the tuple. */
+        var f21: T21 = null
+        /** Field 22 of the tuple. */
+        var f22: T22 = null
+        /** Field 23 of the tuple. */
+        var f23: T23 = null
+        /** Field 24 of the tuple. */
+        var f24: T24 = null
+
+        override def setField[T](value: T, pos: Int): Unit = ???
+
+        override def getField[T](pos: Int): T = ???
+
+        override def getArity: Int = ???
+
+        override def copy[T <: Tuple](): T = ???
     }
 }
