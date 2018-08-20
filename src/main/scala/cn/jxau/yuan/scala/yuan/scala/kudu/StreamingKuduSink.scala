@@ -2,7 +2,7 @@ package cn.jxau.yuan.scala.yuan.scala.kudu
 
 import java.util.{Properties, UUID}
 
-import es.accenture.flink.Sink.KuduSink
+import Sink.KuduSink
 import es.accenture.flink.Utils.RowSerializable
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
 import org.apache.flink.streaming.api.scala._
@@ -31,7 +31,7 @@ object StreamingKuduSink {
                val dateTime = new time.DateTime(event.getNginxTimeMs)
                val nginxDate = dateTime.toString("yyyyMMdd")
                val nginxHour = dateTime.toString("HH")
-               val rowSerializable = new RowSerializable
+               val rowSerializable = new RowSerializable(100)
                rowSerializable.setField(0, nginxDate)
                rowSerializable.setField(1, event.getEventId)
                rowSerializable.setField(2, nginxHour)
@@ -93,7 +93,16 @@ object StreamingKuduSink {
                rowSerializable.setField(58, event.getZ3D)
                rowSerializable
         })
-        .addSink(new KuduSink("node101.bigdata.dmp.local.com:7051", "ods_kudu_pv_event_1d"))
+        .addSink(new KuduSink("node101.bigdata.dmp.local.com:7051,node102.bigdata.dmp.local.com:7051,node103.bigdata.dmp.local.com:7051", "ods_kudu_pv_event_1d",
+               Array("nginx_date", "event_id", "nginx_hour", "nginx_time", "app_key"
+                      , "device_id", "publish", "imei", "mac", "imsi", "idfa", "uid", "lat", "lon"
+                      , "province", "city", "city_key", "os", "os_version", "pkg", "version_code"
+                      , "sdk_version", "app_version", "screen_width", "screen_height", "access_network"
+                      , "country", "device_spec", "time_zone", "sp", "language", "channel", "event_type"
+                      , "event_time", "content_id", "content_model", "project", "p_table", "cm_module", "cm_id"
+                      , "alg_from", "position", "module", "start_num", "args", "card_id"
+                      , "category_id", "topic_id", "circle_id", "remind_id"
+                      , "subject_id", "story_id", "item_id", "section_id", "ip", "user_agent", "x3d", "y3d", "z3d")))
 
         env.execute()
     }
