@@ -13,7 +13,7 @@ import suishen.message.event.define.PVEvent
 
 /**
   * 1、总是报空指针异常，原因暂时不明确
-  *    1、可能版本不正确？
+  *    1、可能版本不正确，大概率是这个原因？
   *    2、the offical example is java, it has problems ?
   *
   * @author zhaomingyuan
