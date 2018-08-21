@@ -1,8 +1,9 @@
 package cn.jxau.yuan.scala.yuan.scala.kudu.utils;
 
-import org.apache.flink.api.java.tuple.Tuple;
 
-public class Tuple59<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37, T38, T39, T40, T41, T42, T43, T44, T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55, T56, T57, T58, T59> extends org.apache.flink.api.java.tuple.Tuple{
+import kudu.internal.KuduTuple;
+
+public class Tuple59<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37, T38, T39, T40, T41, T42, T43, T44, T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55, T56, T57, T58, T59> extends KuduTuple{
 
     private static final long serialVersionUID = 1L;
 
@@ -91,6 +92,9 @@ public class Tuple59<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13,
     public T57 f57;
     public T58 f58;
     public T59 f59;
+
+    public Tuple59() {
+    }
 
     public Tuple59(T0 f0, T1 f1, T2 f2, T3 f3, T4 f4, T5 f5, T6 f6, T7 f7, T8 f8, T9 f9, T10 f10, T11 f11, T12 f12, T13 f13, T14 f14, T15 f15, T16 f16, T17 f17, T18 f18, T19 f19, T20 f20, T21 f21, T22 f22, T23 f23, T24 f24, T25 f25, T26 f26, T27 f27, T28 f28, T29 f29, T30 f30, T31 f31, T32 f32, T33 f33, T34 f34, T35 f35, T36 f36, T37 f37, T38 f38, T39 f39, T40 f40, T41 f41, T42 f42, T43 f43, T44 f44, T45 f45, T46 f46, T47 f47, T48 f48, T49 f49, T50 f50, T51 f51, T52 f52, T53 f53, T54 f54, T55 f55, T56 f56, T57 f57, T58 f58, T59 f59) {
         this.f0 = f0;
@@ -339,15 +343,5 @@ public class Tuple59<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13,
             case 59:this.f59 = (T59) value;break;
             default: throw new IndexOutOfBoundsException(String.valueOf(pos));
         }
-    }
-
-    @Override
-    public int getArity() {
-        return 0;
-    }
-
-    @Override
-    public <T extends Tuple> T copy() {
-        return null;
     }
 }

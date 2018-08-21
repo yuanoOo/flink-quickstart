@@ -128,6 +128,69 @@ public class KuduUtils {
     }
 
     /**
+     * Inserts a Flink tuple as a record in a Kudu table
+     *
+     * @param tuple   Flink tuple
+     * @param table   Kudu table
+     * @param session Kudu session
+     * @return
+     */
+    public static OperationResponse insertKuduTuple(
+            KuduTuple tuple,
+            KuduTable table,
+            KuduSession session,
+            KuduOutputFormat.Conf.WriteMode mode) {
+        Operation insert = mode == KuduOutputFormat.Conf.WriteMode.INSERT
+                ? table.newInsert()
+                : table.newUpsert();
+        table.newUpsert();
+        PartialRow row = insert.getRow();
+
+        for (int i = 0; i < table.getSchema().getColumnCount(); i++) {
+            ColumnSchema columnSchema = table.getSchema().getColumnByIndex(i);
+            Type type = columnSchema.getType();
+            switch (type) {
+                case BINARY:
+                    row.addBinary(i, (byte[]) tuple.getField(i));
+                    break;
+                case STRING:
+                    row.addString(i, tuple.getField(i));
+                    break;
+                case BOOL:
+                    row.addBoolean(i, tuple.getField(i));
+                    break;
+                case DOUBLE:
+                    row.addDouble(i, tuple.getField(i));
+                    break;
+                case FLOAT:
+                    row.addFloat(i, tuple.getField(i));
+                    break;
+                case INT8:
+                    row.addByte(i, tuple.getField(i));
+                    break;
+                case INT16:
+                    row.addShort(i, tuple.getField(i));
+                    break;
+                case INT32:
+                    row.addInt(i, tuple.getField(i));
+                    break;
+                case INT64:
+                case UNIXTIME_MICROS:
+                    row.addLong(i, tuple.getField(i));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Illegal var type: " + type);
+            }
+        }
+        try {
+            return session.apply(insert);
+        } catch (KuduException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * It creates a Kudu session using a KuduClient instance
      *
      * @param client KuduClient

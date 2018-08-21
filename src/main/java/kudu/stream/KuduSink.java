@@ -18,6 +18,7 @@
 package kudu.stream;
 
 import kudu.batch.KuduOutputFormat;
+import kudu.internal.KuduTuple;
 import kudu.internal.KuduUtils;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
@@ -31,6 +32,7 @@ import org.apache.kudu.client.OperationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static kudu.internal.KuduUtils.insertKuduTuple;
 import static kudu.internal.KuduUtils.insertTuple;
 
 
@@ -39,7 +41,7 @@ import static kudu.internal.KuduUtils.insertTuple;
  *
  * @param <IN> Class extending from org.apache.flink.api.java.tuple.Tuple
  */
-public class KuduSink<IN extends Tuple> extends RichSinkFunction<IN> {
+public class KuduSink<IN extends KuduTuple> extends RichSinkFunction<IN> {
 
     private static final Logger LOG = LoggerFactory.getLogger(KuduOutputFormat.class);
 
@@ -76,7 +78,7 @@ public class KuduSink<IN extends Tuple> extends RichSinkFunction<IN> {
 
     @Override
     public void invoke(IN tuple) throws Exception {
-        OperationResponse op = insertTuple(tuple, this.table, this.session, conf.getWriteMode());
+        OperationResponse op = insertKuduTuple(tuple, this.table, this.session, conf.getWriteMode());
         if(op.hasRowError()){
             LOG.warn("An error occurred trying to insert a record in Kudu : {} ", op.getRowError());
         }
