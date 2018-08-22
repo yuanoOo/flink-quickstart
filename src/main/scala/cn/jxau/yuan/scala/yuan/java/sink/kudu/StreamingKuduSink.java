@@ -34,12 +34,6 @@ public class StreamingKuduSink {
         Properties kafkaProps = new Properties();
         kafkaProps.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
         kafkaProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "flink-01");
-        KuduOutputFormat.Conf outputConfig = KuduOutputFormat.Conf
-                .builder()
-                .masterAddress("node101.bigdata.dmp.local.com:7051,node102.bigdata.dmp.local.com:7051,node103.bigdata.dmp.local.com:7051")
-                .tableName("ods_kudu_pv_event_1d")
-                .writeMode(KuduOutputFormat.Conf.WriteMode.UPSERT)
-                .build();
 
         /* Streaming mode - DataSream API - */
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -123,9 +117,9 @@ public class StreamingKuduSink {
         AsyncDataStream.unorderedWait(
                 map,
                 new KuduAsyncFunction(),
-                50000,
-                TimeUnit.MILLISECONDS,
-                20).setParallelism(1);
+                5,
+                TimeUnit.SECONDS,
+                20).setParallelism(1).print();
 
         env.execute();
     }

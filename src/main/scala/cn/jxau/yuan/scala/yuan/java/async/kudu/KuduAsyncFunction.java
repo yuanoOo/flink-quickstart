@@ -31,7 +31,7 @@ public class KuduAsyncFunction extends RichAsyncFunction<KuduTuple, Void>{
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         asyncKuduClient = new AsyncKuduClient.AsyncKuduClientBuilder(KUDU_MASTER).build();
-        table = asyncKuduClient.openTable(KUDU_TABLE).join(50000000);
+        table = asyncKuduClient.openTable(KUDU_TABLE).join(60000);
         asyncKuduSession = asyncKuduClient.newSession();
     }
 
