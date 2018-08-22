@@ -1,10 +1,13 @@
 package cn.jxau.yuan.scala.yuan.scala.kudu
 
+import java.util.concurrent.TimeUnit
 import java.util.{Properties, UUID}
 
+import cn.jxau.yuan.scala.yuan.java.async.kudu.KuduAsyncFunction
 import cn.jxau.yuan.scala.yuan.scala.kudu.utils.Tuple59
 import kudu.batch.KuduOutputFormat
 import kudu.batch.KuduOutputFormat.Conf.WriteMode
+import kudu.internal.KuduTuple
 import kudu.stream.KuduSink
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
 import org.apache.flink.streaming.api.scala._
