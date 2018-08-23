@@ -65,7 +65,7 @@ under the License.
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<flink.version>1.4.2</flink.version>
 		<scala.binary.version>2.11</scala.binary.version>
-		<scala.version>2.11.12</scala.version>
+		<scala.version>2.11.11</scala.version>
 		<kudu.version>1.4.0</kudu.version>
 	</properties>
 
@@ -188,11 +188,11 @@ under the License.
 		</dependency>
 
 		<!---aerospike dependency start-->
-		<!--<dependency>-->
-			<!--<groupId>com.aerospike</groupId>-->
-			<!--<artifactId>aerospike-client</artifactId>-->
-			<!--<version>4.0.6</version>-->
-		<!--</dependency>-->
+		<dependency>
+			<groupId>com.aerospike</groupId>
+			<artifactId>aerospike-client</artifactId>
+			<version>4.0.6</version>
+		</dependency>
 
 	</dependencies>
 
@@ -258,6 +258,10 @@ under the License.
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>scala-maven-plugin</artifactId>
 				<version>3.2.2</version>
+				<configuration>
+					<scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
+					<scalaVersion>${scala.version}</scalaVersion>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>

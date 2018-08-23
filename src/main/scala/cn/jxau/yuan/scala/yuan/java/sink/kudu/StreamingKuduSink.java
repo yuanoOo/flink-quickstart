@@ -117,7 +117,7 @@ public class StreamingKuduSink {
                 new KuduAsyncFunction(),
                 200,
                 TimeUnit.SECONDS,
-                20).setParallelism(1).print();
+                5).setParallelism(1).print();
 
         env.execute();
     }

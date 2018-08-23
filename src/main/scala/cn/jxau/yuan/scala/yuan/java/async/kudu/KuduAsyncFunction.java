@@ -1,6 +1,7 @@
 package cn.jxau.yuan.scala.yuan.java.async.kudu;
 
 import com.stumbleupon.async.Callback;
+import com.stumbleupon.async.Deferred;
 import kudu.internal.KuduTuple;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.async.ResultFuture;
@@ -8,6 +9,9 @@ import org.apache.flink.streaming.api.functions.async.RichAsyncFunction;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.*;
+
+import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 1、现在的场景，KuduTable是固定不变的，没有必要每次都去获取，在open中初始化即可
@@ -38,7 +42,6 @@ public class KuduAsyncFunction extends RichAsyncFunction<KuduTuple, Void>{
     public void asyncInvoke(KuduTuple tuple, ResultFuture<Void> resultFuture) throws Exception {
         Upsert upsert = table.newUpsert();
         PartialRow row = upsert.getRow();
-
         for (int i = 0; i < table.getSchema().getColumnCount(); i++) {
             ColumnSchema columnSchema = table.getSchema().getColumnByIndex(i);
             Type type = columnSchema.getType();
@@ -75,18 +78,18 @@ public class KuduAsyncFunction extends RichAsyncFunction<KuduTuple, Void>{
                     throw new IllegalArgumentException("Illegal var type: " + type);
             }
         }
-        asyncKuduSession.apply(upsert).addCallback(new Callback<Void, OperationResponse>() {
-            @Override
-            public Void call(OperationResponse operationResponse) throws Exception {
-                   if (operationResponse.hasRowError()){
-                       resultFuture.completeExceptionally(new Exception(operationResponse.getRowError().toString()));
-                   }
-
-//                   resultFuture.complete(Collections.emptyList());
-                resultFuture.completeExceptionally(new Exception(operationResponse.getRowError().toString()));
-
-                   return null;
+        Deferred<OperationResponse> apply = asyncKuduSession.apply(upsert);
+        CompletableFuture.supplyAsync(() -> {
+            try {
+                return apply.join(10000L);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
             }
+        }).thenAccept(resp -> {
+            System.out.println("result finish=======>" + resp.hasRowError());
+//            resultFuture.completeExceptionally(new Exception());
+            resultFuture.complete(Collections.emptyList());
         });
     }
 
