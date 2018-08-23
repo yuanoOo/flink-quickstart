@@ -78,19 +78,26 @@ public class KuduAsyncFunction extends RichAsyncFunction<KuduTuple, Void>{
                     throw new IllegalArgumentException("Illegal var type: " + type);
             }
         }
-        Deferred<OperationResponse> apply = asyncKuduSession.apply(upsert);
-        CompletableFuture.supplyAsync(() -> {
-            try {
-                return apply.join(10000L);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }).thenAccept(resp -> {
-            System.out.println("result finish=======>" + resp.hasRowError());
-//            resultFuture.completeExceptionally(new Exception());
+//        Deferred<OperationResponse> apply = asyncKuduSession.apply(upsert);
+//        CompletableFuture.supplyAsync(() -> {
+//            try {
+//                return apply.join(10000L);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//        }).thenAccept(resp -> {
+//            System.out.println("result finish=======>" + resp.hasRowError());
+//            resultFuture.complete(Collections.emptyList());
+//        });
+
+        // ---------------显然回调也可以
+        asyncKuduSession.apply(upsert).addCallback((Callback<Void, OperationResponse>) arg -> {
+            System.out.println("calling=====>" + arg.hasRowError());
             resultFuture.complete(Collections.emptyList());
+            return null;
         });
+
     }
 
 
