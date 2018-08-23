@@ -9,8 +9,6 @@ import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.*;
 
-import java.util.Collections;
-
 /**
  * 1、现在的场景，KuduTable是固定不变的，没有必要每次都去获取，在open中初始化即可
  *

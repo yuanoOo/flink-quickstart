@@ -188,25 +188,11 @@ under the License.
 		</dependency>
 
 		<!---aerospike dependency start-->
-		<dependency>
-			<groupId>com.aerospike</groupId>
-			<artifactId>aerospike-client</artifactId>
-			<version>4.0.6</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-slf4j-impl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.aerospike</groupId>-->
+			<!--<artifactId>aerospike-client</artifactId>-->
+			<!--<version>4.0.6</version>-->
+		<!--</dependency>-->
 
 	</dependencies>
 
@@ -232,7 +218,6 @@ under the License.
 									<exclude>com.google.code.findbugs:jsr305</exclude>
 									<exclude>org.slf4j:*</exclude>
                                     <exclude>log4j:*</exclude>
-
 								</excludes>
 							</artifactSet>
 							<filters>

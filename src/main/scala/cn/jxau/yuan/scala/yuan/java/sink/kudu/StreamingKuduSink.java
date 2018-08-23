@@ -1,14 +1,12 @@
 package cn.jxau.yuan.scala.yuan.java.sink.kudu;
 
 import cn.jxau.yuan.scala.yuan.java.async.kudu.KuduAsyncFunction;
-import cn.jxau.yuan.scala.yuan.scala.kudu.utils.Tuple59;
-import kudu.batch.KuduOutputFormat;
+import cn.jxau.yuan.scala.yuan.java.sink.kudu.utils.Tuple59;
 import kudu.internal.KuduTuple;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
