@@ -117,7 +117,7 @@ public class StreamingKuduSink {
         AsyncDataStream.unorderedWait(
                 map,
                 new KuduAsyncFunction(),
-                5,
+                200,
                 TimeUnit.SECONDS,
                 20).setParallelism(1).print();
 

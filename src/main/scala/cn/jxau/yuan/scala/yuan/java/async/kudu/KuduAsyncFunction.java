@@ -84,7 +84,8 @@ public class KuduAsyncFunction extends RichAsyncFunction<KuduTuple, Void>{
                        resultFuture.completeExceptionally(new Exception(operationResponse.getRowError().toString()));
                    }
 
-                   resultFuture.complete(Collections.emptyList());
+//                   resultFuture.complete(Collections.emptyList());
+                resultFuture.completeExceptionally(new Exception(operationResponse.getRowError().toString()));
 
                    return null;
             }
