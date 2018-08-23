@@ -78,6 +78,8 @@ public class KuduAsyncFunction extends RichAsyncFunction<KuduTuple, Void>{
                     throw new IllegalArgumentException("Illegal var type: " + type);
             }
         }
+
+        //--------------------没有回调，利用CompletableFuture.supplyAsync转为异步
 //        Deferred<OperationResponse> apply = asyncKuduSession.apply(upsert);
 //        CompletableFuture.supplyAsync(() -> {
 //            try {
