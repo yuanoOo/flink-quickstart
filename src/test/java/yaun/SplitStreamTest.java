@@ -1,4 +1,4 @@
-package flink.java;
+package yaun;
 
 import org.apache.flink.streaming.api.collector.selector.OutputSelector;
 import org.apache.flink.streaming.api.datastream.SplitStream;
