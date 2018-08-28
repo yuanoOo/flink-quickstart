@@ -36,8 +36,12 @@ object StreamingKuduSink {
 
         /* Streaming mode - DataSream API - */
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-        env.addSource(new FlinkKafkaConsumer010[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
-                .map(event2Map)
+        env.addSource(new FlinkKafkaConsumer010[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] {
+            override def deserialize(message: Array[Byte]): PVEvent.Entity = {
+                PVEvent.Entity.parseFrom(message)
+            }
+        }, kafkaProps).setStartFromEarliest())
+                .map(event2Map).setParallelism(2)
                 .addSink(new KuduSink[Tuple59[String, String, String, Long, Int, String, String, String, String, String,
                         String, Long, String, String, String, String, Int, String, String, String,
                         Int, String, String, String, String, String, String, String, Int, String,
