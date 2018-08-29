@@ -1,19 +1,14 @@
-package cn.jxau.yuan.scala.yuan.scala.kafka
+package cn.jxau.yuan.scala.yuan.scala.sink.hbase.batch
 
 import java.io.IOException
 import java.util.Properties
 
-import scala.collection.JavaConverters._
 import org.apache.flink.api.common.io.OutputFormat
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
-import org.apache.flink.api.common.typeinfo.{BasicTypeInfo, TypeInformation}
-import org.apache.flink.api.java.tuple.Tuple
 import org.apache.flink.configuration.Configuration
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala.function.WindowFunction
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
-import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.windows.{GlobalWindow, Window}
+import org.apache.flink.streaming.api.windowing.windows.GlobalWindow
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.flink.util.Collector
@@ -24,14 +19,16 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.slf4j.LoggerFactory
 import suishen.message.event.define.PVEvent
 
+import scala.collection.JavaConverters._
+
 /**
   * @author zhaomingyuan
   * @date 18-7-31
   * @time 下午3:20
   */
-object FlinkKafkaExample {
+object HBaseSinkWithBatch {
 
-    private val LOG = LoggerFactory.getLogger(FlinkKafkaExample.getClass)
+    private val LOG = LoggerFactory.getLogger(HBaseSinkWithBatch.getClass)
     private val BOOTSTRAP_SERVERS = "node104.bigdata.dmp.local.com:9092,node105.bigdata.dmp.local.com:9092,node106.bigdata.dmp.local.com:9092"
 
     def main(args: Array[String]): Unit = {
@@ -47,6 +44,7 @@ object FlinkKafkaExample {
             .setParallelism(1)
             .uid("pv-event-kafka-source")
             .filter(event => event != null && event.getNginxTimeMs > 1527584646000L)
+            .setParallelism(1)
             .uid("filter null pv-event")
 
         // window count
@@ -68,15 +66,15 @@ object FlinkKafkaExample {
         // window agg batch for sink
         filter.map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, event.getEventId))
                 .keyBy(_.eventId.substring(0, 2))
-                .countWindow(100)
+                .countWindow(1000)
                 .apply(new WindowFunction[PvEvent, Array[PvEvent], String, GlobalWindow] {
                     override def apply(key: String, window: GlobalWindow, input: Iterable[PvEvent], out: Collector[Array[PvEvent]]): Unit = {
-                        println("key =====> " + key)
-                        println("batch pv event ===> " + input.toArray.length)
                         out.collect(input.toArray)
                     }
                 })
+                .setParallelism(1)
                 .writeUsingOutputFormat(new HBaseBatchOutputFormat)
+                .setParallelism(1)
 
         env.execute("local-cluster-flink-kafka-test")
     }
