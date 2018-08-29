@@ -36,7 +36,7 @@ object HBaseSinkNoBatch {
         kafkaProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "flink-01")
 
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+        env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
         env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
         val filter = env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
@@ -57,6 +57,7 @@ object HBaseSinkNoBatch {
         // hbase sink
         filter.map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, event.getEventId))
             .setParallelism(1)
+            .rescale
             .uid("sink hbase flow map pv-event to case class")
             .writeUsingOutputFormat(new HBaseOutputFormat())
             .setParallelism(1)

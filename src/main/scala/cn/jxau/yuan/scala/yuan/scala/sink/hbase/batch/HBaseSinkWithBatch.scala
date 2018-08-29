@@ -2,6 +2,7 @@ package cn.jxau.yuan.scala.yuan.scala.sink.hbase.batch
 
 import java.io.IOException
 import java.util.Properties
+import java.util.concurrent.TimeUnit
 
 import org.apache.flink.api.common.io.OutputFormat
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
@@ -37,8 +38,8 @@ object HBaseSinkWithBatch {
         kafkaProps.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "flink-01")
 
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-        env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
+        env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
+        env.enableCheckpointing(TimeUnit.HOURS.toMillis(1), CheckpointingMode.EXACTLY_ONCE)
 
         val filter = env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message) }, kafkaProps).setStartFromEarliest())
             .setParallelism(1)
@@ -65,7 +66,7 @@ object HBaseSinkWithBatch {
 
         // window agg batch for sink
         filter.map(event => PvEvent(event.getEventTimeMs, event.getAppKey, event.getEvent, event.getEventId))
-                .keyBy(_.eventId.substring(0, 2))
+                .keyBy(_.appKey.toString)
                 .countWindow(1000)
                 .apply(new WindowFunction[PvEvent, Array[PvEvent], String, GlobalWindow] {
                     override def apply(key: String, window: GlobalWindow, input: Iterable[PvEvent], out: Collector[Array[PvEvent]]): Unit = {
