@@ -29,7 +29,7 @@ http://wuchong.me/blog/2016/05/09/flink-internals-understanding-execution-resour
 
 
 ### 四、CoLocationGroup
-
+- 主要用于迭代流（暂略）
 
 ### 五、原理与实现
 - Slot的组织关系(Slot, SimpleSlot, SharedSlot)
