@@ -1,7 +1,6 @@
 package cn.jxau.yuan.scala.yuan.java.async.kudu;
 
 import com.stumbleupon.async.Callback;
-import com.stumbleupon.async.Deferred;
 import kudu.internal.KuduTuple;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.async.ResultFuture;
@@ -11,7 +10,6 @@ import org.apache.kudu.Type;
 import org.apache.kudu.client.*;
 
 import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 1、现在的场景，KuduTable是固定不变的，没有必要每次都去获取，在open中初始化即可
