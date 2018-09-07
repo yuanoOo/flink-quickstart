@@ -21,6 +21,7 @@ import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.table.api.TableEnvironment
 import org.apache.flink.table.api.scala._
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Simple example for demonstrating the use of SQL on a Stream Table.
@@ -32,6 +33,8 @@ import org.apache.flink.table.api.scala._
   *
   */
 object StreamSQLExample {
+
+  private val LOG = LoggerFactory.getLogger(StreamSQLExample.getClass)
 
   // *************************************************************************
   //     PROGRAM
@@ -61,10 +64,11 @@ object StreamSQLExample {
     val result = tEnv.sqlQuery(
       "SELECT * FROM OrderA WHERE amount > 2 UNION ALL " +
         "SELECT * FROM OrderB WHERE amount < 2")
+    result.toAppendStream[Order].map(e => {
+      LOG.warn(e.amount.toString)
+    })
 
-    result.toAppendStream[Order].print()
-
-    env.execute()
+    env.setBufferTimeout(-1).execute()
   }
 
   // *************************************************************************
