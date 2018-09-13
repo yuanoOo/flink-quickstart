@@ -82,9 +82,15 @@ public class ByteBufExamples {
      */
     public static void directBuffer() {
         ByteBuf directBuf = BYTE_BUF_FROM_SOMEWHERE; //get reference form somewhere
+
+        // 检查ByteBuf是否由数组进行支撑，否则是一个直接缓冲区
         if (!directBuf.hasArray()) {
+            // 获取可读字节数
             int length = directBuf.readableBytes();
+
+            // 分配一个新的字节数组，进行保存
             byte[] array = new byte[length];
+            // Transfers this buffer's data to the specified destination starting at the specified absolute {@code index}.
             directBuf.getBytes(directBuf.readerIndex(), array);
             handleArray(array, 0, length);
         }
@@ -139,7 +145,8 @@ public class ByteBufExamples {
     /**
      * Listing 5.6 Access data
      */
-    public static void byteBufRelativeAccess() {
+    @Test
+    public void byteBufRelativeAccess() {
         ByteBuf buffer = BYTE_BUF_FROM_SOMEWHERE; //get reference form somewhere
         for (int i = 0; i < buffer.capacity(); i++) {
             byte b = buffer.getByte(i);
