@@ -98,14 +98,13 @@ public class ByteBufExamples {
 
     /**
      * Listing 5.3 Composite buffer pattern using ByteBuffer
+     *
+     * 利用JDK中ByteBuffer实现复合缓冲区的需求
      */
     public static void byteBufferComposite(ByteBuffer header, ByteBuffer body) {
         // Use an array to hold the message parts
         ByteBuffer[] message =  new ByteBuffer[]{ header, body };
 
-        /**
-         * header.remaining(): 返回当前位置和limit之间的元素数。
-         */
         // Create a new ByteBuffer and use copy to merge the header and body
         ByteBuffer message2 =
                 ByteBuffer.allocate(header.remaining() + body.remaining());
@@ -117,6 +116,9 @@ public class ByteBufExamples {
 
     /**
      * Listing 5.4 Composite buffer pattern using CompositeByteBuf
+     *
+     * netty中的复合缓冲区模式：CompositeByteBuf
+     *
      */
     @Test
     public void byteBufComposite() {
@@ -133,6 +135,10 @@ public class ByteBufExamples {
 
     /**
      * Listing 5.5 Accessing the data in a CompositeByteBuf
+     *
+     * 访问CompositeByteBuf中的数据
+     * 由于无法访问CompositeByteBuf的支撑数组，因此和directBuffer很像
+     *
      */
     public static void byteBufCompositeArray() {
         CompositeByteBuf compBuf = Unpooled.compositeBuffer();
