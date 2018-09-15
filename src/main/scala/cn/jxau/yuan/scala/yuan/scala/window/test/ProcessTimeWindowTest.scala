@@ -1,4 +1,4 @@
-package cn.jxau.yuan.scala.yuan.test.simple
+package cn.jxau.yuan.scala.yuan.scala.window.test
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.scala._
@@ -15,7 +15,7 @@ import scala.util.Random
   * @date 18-9-15
   * @time 下午6:44
   */
-object WindowTest {
+object ProcessTimeWindowTest {
 
     def main(args: Array[String]): Unit = {
         val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -29,12 +29,12 @@ object WindowTest {
                     println("max ===> " + convert(w.maxTimestamp()))
                     println(w)
                     coll.collect("aggreation")
-                }).setParallelism(1).print()
+                }).setParallelism(1).print().setParallelism(1)
 
         env.execute()
     }
 
-    def convert(time: Long) = {
+    def convert(time: Long): String = {
         new DateTime(time).toString("yyyy-MM-dd HH:mm:ss")
     }
 
