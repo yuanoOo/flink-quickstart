@@ -2,6 +2,7 @@ package cn.jxau.yuan.scala.yuan.scala.window.test
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.util.Collector
 import org.joda.time.DateTime
@@ -15,7 +16,7 @@ import scala.util.Random
   * @date 18-9-15
   * @time 下午6:44
   */
-object ProcessTimeWindowTest {
+object TumblingProcessTimeWindowTest {
 
     def main(args: Array[String]): Unit = {
         val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -39,7 +40,7 @@ object ProcessTimeWindowTest {
     }
 
     """
-      timeWindow(Time.minutes(1)) && ProcessTime
+      Tumbling timeWindow(Time.minutes(1)) && ProcessTime
 
          |now ===> 2018-09-15 20:11:02
          |start ===> 2018-09-15 20:10:00

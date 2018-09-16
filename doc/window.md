@@ -51,9 +51,9 @@ in China you would have to specify an offset of Time.hours(-8).
 如果你想改变它，你可以给出一个偏移量。如果偏移15分钟，你会得到1：15：00.000 - 2：14：59.999,2：15：00.000 - 3：14：59.999等。
 偏移的一个重要用例是调整窗口到时区不是UTC-0。例如，在中国，您必须指定Time.hours（-8）的偏移量。
 
-- 3、一个ProcessTime时间窗口日志打印示例
+- 3、一个翻滚ProcessTime时间窗口日志打印示例
 ```
-      timeWindow(Time.minutes(1)) && ProcessTime
+      Tumbling timeWindow(Time.minutes(1)) && ProcessTime
 
             now ===> 2018-09-15 20:11:02
             start ===> 2018-09-15 20:10:00
