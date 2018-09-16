@@ -2,7 +2,6 @@ package cn.jxau.yuan.scala.yuan.scala.window.test
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.util.Collector
 import org.joda.time.DateTime
