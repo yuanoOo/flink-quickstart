@@ -87,5 +87,4 @@ taskmanager.memory.off-heap: true
 
 - 启动flink应用成功，即可在yarn ui 点击对应应用的ApplicationMaster链接,既可以查看flink-ui ，并查看flink 应用运行情况。
 
-注：在安装部署遇到任何问题，可以在小象问答，微信群以及私聊提出，我们一般会在晚上作答（由于白天要上班，作答不及时请谅解。）
 
