@@ -37,10 +37,9 @@ class BloomFilterInValueState extends RichFilterFunction[String] {
         if (nonExist) {
             localBloom.put(value)
             longPoint += 1
-            println(value + "===> false")
         }
 
-        if (longPoint >= EXPECTED_INSERTIONS) rotaBloomFilter()
+        if (longPoint >= EXPECTED_INSERTIONS) rotateBloomFilter()
 
         nonExist
     }
@@ -56,15 +55,14 @@ class BloomFilterInValueState extends RichFilterFunction[String] {
         point = getRuntimeContext.getState(pointDescriptor)
     }
 
-    def rotaBloomFilter(): Unit = {
+    def rotateBloomFilter(): Unit = {
         sum.update(bloomFilter)
         localBloom = sum.value()
         println(localBloom.toString)
-        LOG.info("init bloom filter...")
+        LOG.info("rotate bloom filter...")
 
         point.update(0)
         longPoint = point.value()
-        LOG.info("init point...")
     }
 
     def noContain(value: String): Boolean = !localBloom.mightContain(value)
