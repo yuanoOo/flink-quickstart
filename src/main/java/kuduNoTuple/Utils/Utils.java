@@ -9,7 +9,8 @@ import org.apache.kudu.ColumnSchema.ColumnSchemaBuilder;
 import org.apache.kudu.Schema;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -20,7 +21,7 @@ public class Utils {
     private KuduSession session;
 
     // LOG4J
-    private final static Logger logger = Logger.getLogger(Utils.class);
+    private final static Logger logger = LoggerFactory.getLogger(Utils.class);
 
     /**
      * Builder Util Class which creates a Kudu client and log in to be able to perform operations later
@@ -65,7 +66,7 @@ public class Utils {
      * @throws KuduTableException   In case of can't access to a table o can't create it (wrong params or not existing table)
      * @throws KuduException        In case of error of Kudu
      */
-    public KuduTable useTable(String tableName, Integer tableMode) throws KuduTableException, KuduException {
+    public KuduTable useTable(String tableName, Integer tableMode) throws KuduTableException {
         KuduTable table;
 
         if (tableMode == KuduOutputFormat.CREATE) {
@@ -336,7 +337,7 @@ public class Utils {
             res = false;
         } else{
             for (int i = 0; i < tableNames.length; i++) {
-                res = tableNames[i].equals(providedNames[i]) ? true : false;
+                res = tableNames[i].equals(providedNames[i]);
             }
         }
         if(!res){

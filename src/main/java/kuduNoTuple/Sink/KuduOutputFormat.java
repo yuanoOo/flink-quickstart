@@ -7,7 +7,8 @@ import kuduNoTuple.Utils.Utils;
 import org.apache.flink.api.common.io.RichOutputFormat;
 import org.apache.flink.configuration.Configuration;
 import org.apache.kudu.client.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -29,7 +30,7 @@ public class KuduOutputFormat extends RichOutputFormat<RowSerializable> {
 
 
     //LOG4J
-    private final static Logger logger = Logger.getLogger(KuduOutputFormat.class);
+    private final static Logger logger = LoggerFactory.getLogger(KuduOutputFormat.class);
     private static final Object lock = new Object();
     /**
      * Builder to use when you want to create a new table
@@ -39,7 +40,7 @@ public class KuduOutputFormat extends RichOutputFormat<RowSerializable> {
      * @param fieldsNames List of column names in the table to be created
      * @param tableMode   Way to operate with table (CREATE, APPEND, OVERRIDE)
      */
-    public KuduOutputFormat(String host, String tableName, String[] fieldsNames, Integer tableMode) throws KuduException, KuduTableException, KuduClientException {
+    public KuduOutputFormat(String host, String tableName, String[] fieldsNames, Integer tableMode) {
         if (tableMode == null || ((!tableMode.equals(CREATE)) && (!tableMode.equals(APPEND)) && (!tableMode.equals(OVERRIDE)))) {
             throw new IllegalArgumentException("ERROR: Param \"tableMode\" not valid (null or empty)");
 
@@ -74,7 +75,7 @@ public class KuduOutputFormat extends RichOutputFormat<RowSerializable> {
      * @throws KuduTableException In case of exception caused by Kudu Tablet
      * @throws KuduException In case of exception caused by Kudu
      */
-    public KuduOutputFormat(String host, String tableName, Integer tableMode) throws KuduException, KuduTableException, KuduClientException {
+    public KuduOutputFormat(String host, String tableName, Integer tableMode) {
         if (tableMode == null || ((!tableMode.equals(CREATE)) && (!tableMode.equals(APPEND)) && (!tableMode.equals(OVERRIDE)))) {
             throw new IllegalArgumentException("ERROR: Param \"tableMode\" not valid (null or empty)");
 
