@@ -21,25 +21,25 @@ class BloomFilterInValueState extends RichFilterFunction[String] {
     private val EXPECTED_INSERTIONS = 1024 * 32
     private def bloomFilter: BloomFilter[CharSequence] = BloomFilter.create(Funnels.stringFunnel(), EXPECTED_INSERTIONS, BLOOM_FPP)
 
-    private var localBloom: BloomFilter[CharSequence] = _
-    private var sum: ValueState[BloomFilter[CharSequence]] = _
+    private var localBloomFilter: BloomFilter[CharSequence] = _
+    private var stateBloomFilter: ValueState[BloomFilter[CharSequence]] = _
     private var point: ValueState[Long] = _
-    private var longPoint: Long = _
+    private var bloomFilterInsertion: Long = _
 
     override def filter(value: String): Boolean = {
-        if (sum.value() == null) {
-            sum.update(bloomFilter)
-            localBloom = sum.value()
-            longPoint = point.value()
+        if (stateBloomFilter.value() == null) {
+            stateBloomFilter.update(bloomFilter)
+            localBloomFilter = stateBloomFilter.value()
+            bloomFilterInsertion = point.value()
         }
 
         val nonExist = noContain(value)
         if (nonExist) {
-            localBloom.put(value)
-            longPoint += 1
+            localBloomFilter.put(value)
+            bloomFilterInsertion += 1
         }
 
-        if (longPoint >= EXPECTED_INSERTIONS) rotateBloomFilter()
+        if (bloomFilterInsertion >= EXPECTED_INSERTIONS) rotateBloomFilter()
 
         nonExist
     }
@@ -49,21 +49,21 @@ class BloomFilterInValueState extends RichFilterFunction[String] {
         val serializer = new KryoSerializer[BloomFilter[CharSequence]](classOf[BloomFilter[CharSequence]], config)
         val descriptor = new ValueStateDescriptor[BloomFilter[CharSequence]]("bloom-filter", serializer)
 
-        sum = getRuntimeContext.getState(descriptor)
+        stateBloomFilter = getRuntimeContext.getState(descriptor)
 
         val pointDescriptor = new ValueStateDescriptor[Long]("point", new TypeHint[Long]() {}.getTypeInfo)
         point = getRuntimeContext.getState(pointDescriptor)
     }
 
     def rotateBloomFilter(): Unit = {
-        sum.update(bloomFilter)
-        localBloom = sum.value()
-        println(localBloom.toString)
+        stateBloomFilter.update(bloomFilter)
+        localBloomFilter = stateBloomFilter.value()
+        println(localBloomFilter.toString)
         LOG.info("rotate bloom filter...")
 
         point.update(0)
-        longPoint = point.value()
+        bloomFilterInsertion = point.value()
     }
 
-    def noContain(value: String): Boolean = !localBloom.mightContain(value)
+    def noContain(value: String): Boolean = !localBloomFilter.mightContain(value)
 }
