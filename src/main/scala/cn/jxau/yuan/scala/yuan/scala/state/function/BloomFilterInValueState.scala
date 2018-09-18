@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory
   * @time 下午4:25
   */
 class BloomFilterInValueState extends RichFilterFunction[String] {
-
     private val LOG = LoggerFactory.getLogger(classOf[BloomFilterInValueState])
+
     private val BLOOM_FPP: Double = 0.0001d
     private val EXPECTED_INSERTIONS = 1024 * 32
     private def bloomFilter: BloomFilter[CharSequence] = BloomFilter.create(Funnels.stringFunnel(), EXPECTED_INSERTIONS, BLOOM_FPP)
@@ -33,7 +33,8 @@ class BloomFilterInValueState extends RichFilterFunction[String] {
             longPoint = point.value()
         }
 
-        if (!localBloom.mightContain(value)) {
+        val nonExist = noContain(value)
+        if (nonExist) {
             localBloom.put(value)
             longPoint += 1
             println(value + "===> false")
@@ -41,7 +42,7 @@ class BloomFilterInValueState extends RichFilterFunction[String] {
 
         if (longPoint >= EXPECTED_INSERTIONS) rotaBloomFilter()
 
-        !sum.value().mightContain(value)
+        nonExist
     }
 
     override def open(parameters: Configuration): Unit = {
@@ -65,4 +66,6 @@ class BloomFilterInValueState extends RichFilterFunction[String] {
         longPoint = point.value()
         LOG.info("init point...")
     }
+
+    def noContain(value: String): Boolean = !localBloom.mightContain(value)
 }
