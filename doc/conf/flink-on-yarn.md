@@ -44,9 +44,9 @@ high-availability.zookeeper.storageDir: hdfs://hdcluster/flink/recovery/
 #checkpoint config
 state.backend: rocksdb
 ## checkpoint到HDFS的目录 根据各自安装的HDFS情况修改
-state.backend.fs.checkpointdir: hdfs://hdcluster/flink/checkpoint
+state.checkpoints.dir: hdfs://hdcluster/flink/checkpoint
 ## 对外checkpoint到HDFS的目录
-state.checkpoints.dir: hdfs://hdcluster/flink/savepoint
+state.savepoints.dir: hdfs://hdcluster/flink/savepoint
 
 #memory config
 env.java.opts: -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+AlwaysPreTouch -server -XX:+HeapDumpOnOutOfMemoryError
