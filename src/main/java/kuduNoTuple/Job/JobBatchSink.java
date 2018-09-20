@@ -59,7 +59,8 @@ public class JobBatchSink {
 
         DataSet<RowSerializable> out = input.map(new MyMapFunction());
 
-        out.output(new KuduOutputFormat(KUDU_MASTER, TABLE_NAME, columnNames, MODE));
+        out.output(new
+                KuduOutputFormat(KUDU_MASTER, TABLE_NAME, columnNames, MODE));
 
         env.execute();
 
@@ -72,7 +73,7 @@ public class JobBatchSink {
      */
     private static class MyMapFunction implements MapFunction<String, RowSerializable> {
         @Override
-        public RowSerializable map(String inputs) throws Exception {
+        public RowSerializable map(String inputs) {
             RowSerializable r = new RowSerializable(3);
             Integer i = 0;
             for (String s : inputs.split(" ")) {

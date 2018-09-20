@@ -32,6 +32,8 @@ public class KuduOutputFormat extends RichOutputFormat<RowSerializable> {
     //LOG4J
     private final static Logger logger = LoggerFactory.getLogger(KuduOutputFormat.class);
     private static final Object lock = new Object();
+
+
     /**
      * Builder to use when you want to create a new table
      *

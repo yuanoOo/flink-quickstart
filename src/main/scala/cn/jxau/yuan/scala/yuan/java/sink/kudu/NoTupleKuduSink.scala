@@ -38,12 +38,13 @@ object NoTupleKuduSink {
         val env = StreamExecutionEnvironment.getExecutionEnvironment
         env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
         env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
+        env.setBufferTimeout(-1)
 
         env.addSource(new FlinkKafkaConsumer010[PVEvent.Entity]("pv-event", new AbstractDeserializationSchema[PVEvent.Entity] { override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message)}, kafkaProps).setStartFromEarliest())
                 .setParallelism(1)
                 .map(new Pv2RowMapping)
                 .setParallelism(1)
-                .writeUsingOutputFormat(new KuduOutputFormat(KUDU_MASTER, KUDU_TABLE, KUDU_FIELD, KuduOutputFormat.OVERRIDE))
+                .writeUsingOutputFormat(new KuduOutputFormat(KUDU_MASTER, KUDU_TABLE, KUDU_FIELD, KuduOutputFormat.APPEND))
                 .setParallelism(1)
 
         env.execute()
