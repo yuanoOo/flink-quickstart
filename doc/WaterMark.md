@@ -1,5 +1,7 @@
 # WaterMark
-http://aitozi.com/flink-watermark.html
+- http://aitozi.com/flink-watermark.html，在该文章中提到两种情况：情况一: late element，情况二：乱序。不用纠结，其实就是一种情况
+  ，只是看晚到的元素如何触发其所属的窗口，可能其所属的窗口早就已经触发过了，其自然会被抛弃。或者其所属的窗口还没被触发（该窗口先到的事件
+  的watermark不够触发该窗口），而这个晚到的元素的Watermark够了（Watermark > window end time），这个窗口就会被触发。
 - waterMark，latency，checkpoint这三者实现方式都是上游节点逐步广播消息给下游节点来处理的行为（都是在流中插入一种特殊的数据结构来做处理）
 
 ## 测试验证
