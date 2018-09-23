@@ -21,7 +21,7 @@ object WatermarkTest {
         val port = 9999
 
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-//        env.setParallelism(1)
+        env.setParallelism(1)
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
         val input = env.socketTextStream(hostName,port)
@@ -36,7 +36,7 @@ object WatermarkTest {
         val watermark = inputMap.assignTimestampsAndWatermarks(new AssignerWithPeriodicWatermarks[(String,Long)] {
 
             var currentMaxTimestamp = 0L
-            val maxOutOfOrderness = 1000L//最大允许的乱序时间是10s
+            val maxOutOfOrderness = 3000L//最大允许的乱序时间是10s
 
             var a : Watermark = null
 
@@ -51,14 +51,14 @@ object WatermarkTest {
                 val timestamp = t._2
                 currentMaxTimestamp = Math.max(timestamp, currentMaxTimestamp)
 //                println("timestamp:" + t._1 +","+ t._2 + "timestamp: " +format.format(t._2) +","+  currentMaxTimestamp + "currentMaxTimestamp: "+ format.format(currentMaxTimestamp) + ","+ a.toString)
-                println(Thread.currentThread().getName + ": timestamp:" + t._1 +"," + "timestamp: " +format.format(t._2) +"," + "currentMaxTimestamp: "+ format.format(currentMaxTimestamp) + ","+ a.toString + format.format(a.getTimestamp))
+                println("timestamp:" + t._1 +"," + "timestamp: " +format.format(t._2) +"," + "currentMaxTimestamp: "+ format.format(currentMaxTimestamp) + ","+ a.toString + format.format(a.getTimestamp))
                 timestamp
             }
         })
 
         val window = watermark
                 .keyBy(_._1)
-                .window(TumblingEventTimeWindows.of(Time.seconds(3)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(1)))
                 .apply(new WindowFunctionTest)
 
         window.print()
@@ -71,7 +71,6 @@ object WatermarkTest {
         override def apply(key: String, window: TimeWindow, input: Iterable[(String, Long)], out: Collector[(String, Int,String,String,String,String)]): Unit = {
             val list = input.toList.sortBy(_._2)
             val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-            println("start: " + window.getStart + "end: " + window.getEnd + ", maxStamp: " + window.maxTimestamp())
             out.collect(key,input.size,format.format(list.head._2),format.format(list.last._2),"start: " + format.format(window.getStart),"end: " + format.format(window.getEnd))
         }
 
