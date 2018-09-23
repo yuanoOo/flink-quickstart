@@ -73,7 +73,7 @@ http://aitozi.com/flink-watermark.html
      
 - 6、Flink中计算窗口时间的单位为ms，即时间戳, 也就是说可能就差那一毫秒，Window就被触发了。
 
-- 7、allowLatency
+- 7、**allowLatency**
   > 默认情况下当watermark涨过了window的endtime之后，再有属于该窗口的数据到来的时候该数据会被丢弃，
     设置了allowLatency这个值之后，也就是定义了数据在watermark涨过window.endtime但是又在allowlatency
     之前到达的话仍旧会被加到对应的窗口去。会使得窗口再次被触发。Flink会保存窗口的状态直到allow latenness超期。
