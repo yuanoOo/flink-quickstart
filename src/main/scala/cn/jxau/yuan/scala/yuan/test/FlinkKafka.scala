@@ -3,7 +3,9 @@ package cn.jxau.yuan.scala.yuan.test;
 import java.util.Properties
 
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
+import org.apache.flink.contrib.streaming.state.RocksDBStateBackend
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
+import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.kafka.clients.consumer.ConsumerConfig
 
@@ -29,18 +31,7 @@ object FlinkKafka {
                     String.valueOf(message)
                 }
             }, kafkaProps).setStartFromEarliest()
-        ).print()
-
-
-//        val myProducer: FlinkKafkaProducer010[String]= new FlinkKafkaProducer010[String](BOOTSTRAP_SERVERS, "flink-01", new SimpleStringSchema())
-//        myProducer.setWriteTimestampToKafka(true)
-//
-//        env.fromElements("fsfsfsf,fsfsfs,fsfsfs,fsfsfs,fsfsfss,fsfsfs,fsfsfs,fsfs")
-//                .split(s => {
-//                    println("sds")
-//                    s.split(",")
-//                })
-//                .addSink(myProducer)
+        )
 
         env.execute("local-cluster-flink-kafka-test")
     }

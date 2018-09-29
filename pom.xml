@@ -128,6 +128,15 @@ under the License.
 			<version>${flink.version}</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-statebackend-rocksdb -->
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-statebackend-rocksdb_2.11</artifactId>
+			<version>1.4.2</version>
+			<scope>test</scope>
+		</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common -->
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
