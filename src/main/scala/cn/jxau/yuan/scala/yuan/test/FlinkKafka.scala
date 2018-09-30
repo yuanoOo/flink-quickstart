@@ -3,9 +3,7 @@ package cn.jxau.yuan.scala.yuan.test;
 import java.util.Properties
 
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
-import org.apache.flink.contrib.streaming.state.RocksDBStateBackend
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
-import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.kafka.clients.consumer.ConsumerConfig
 

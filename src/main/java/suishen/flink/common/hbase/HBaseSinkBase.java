@@ -33,7 +33,7 @@ public abstract class HBaseSinkBase<IN> extends RichSinkFunction<IN> implements 
     /**
      * The lock to safeguard the flush commits.
      */
-    private final Object lock = new Object();
+    private Object lock = null;
 
     protected Connection connection;
     protected transient Table hTable;
@@ -54,6 +54,7 @@ public abstract class HBaseSinkBase<IN> extends RichSinkFunction<IN> implements 
 
     @Override
     public void open(Configuration configuration) throws Exception {
+        lock = new Object();
         super.open(configuration);
         if (builder != null) {
             this.connection = builder.buildConnection();

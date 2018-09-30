@@ -46,12 +46,14 @@ public class HBaseBuilder implements Serializable {
         return flushPeriod;
     }
 
-    public void setFlushPeriod(int flushPeriod) {
+    public HBaseBuilder setFlushPeriod(int flushPeriod) {
         this.flushPeriod = flushPeriod;
+        return this;
     }
 
-    public void setBufferSize(long bufferSize) {
+    public HBaseBuilder setBufferSize(long bufferSize) {
         this.bufferSize = bufferSize;
+        return this;
     }
 
     public HBaseBuilder addProperty(String key, String value) {

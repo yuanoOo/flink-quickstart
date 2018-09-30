@@ -6,9 +6,8 @@ import java.util.Properties
 import org.apache.flink.api.common.io.OutputFormat
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema
 import org.apache.flink.configuration.Configuration
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
+import org.apache.flink.streaming.api.functions.sink.SinkFunction
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
-import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer011
 import org.apache.hadoop.hbase.HBaseConfiguration
@@ -16,9 +15,8 @@ import org.apache.hadoop.hbase.client.{HTable, Put}
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.slf4j.LoggerFactory
+import suishen.flink.common.hbase.{HBaseBuilder, HBaseScalaProductSink, HBaseTableMapper}
 import suishen.message.event.define.PVEvent
-
-import scala.collection.JavaConverters._
 
 /**
   * @author zhaomingyuan
@@ -59,12 +57,30 @@ object HBaseSinkNoBatch {
             .setParallelism(1)
             .rescale
             .uid("sink hbase flow map pv-event to case class")
-            .writeUsingOutputFormat(new HBaseOutputFormat())
+            .addSink(buildHBaseSink)
             .setParallelism(1)
             .name("sink hbase")
 
         env.execute("local-cluster-flink-kafka-test")
     }
+
+
+    def buildHBaseSink: SinkFunction[PvEvent] = {
+        val builder = (new HBaseBuilder)
+                .withClusterKey("node101.bigdata.dmp.local.com,node102.bigdata.dmp.local.com,node103.bigdata.dmp.local.com:2181:/hbase")
+                .withTableName("hbase_flink_test")
+                .enableBuffer(true)
+                .setBufferSize(5000).setFlushPeriod(1000)
+
+        val mapper = (new HBaseTableMapper)
+                .addMapping(0, "T", "time", classOf[Long])
+                .addMapping(1, "T", "app_key", classOf[Long])
+                .addMapping(2, "T", "name", classOf[String])
+                .addMapping(3, "T", "device_id", classOf[String])
+                .setRowKey(3, classOf[String])
+        new HBaseScalaProductSink(builder, mapper)
+    }
+
 
     /**
       * extract some filed only for test

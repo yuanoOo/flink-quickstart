@@ -39,6 +39,7 @@ public class HBaseScalaProductSink<IN extends Product> extends HBaseSinkBase<IN>
             Tuple3<byte[], byte[], TypeInformation<?>> colInfo = tableMapper.getColInfo(index);
             put.addColumn(colInfo.f0, colInfo.f1,
                     HBaseTableMapper.serialize(colInfo.f2, value.productElement(Integer.parseInt(index))));
+//            System.out.println(colInfo.f2 + "==>" + value.productElement(Integer.parseInt(index)));
         }
         return put;
     }

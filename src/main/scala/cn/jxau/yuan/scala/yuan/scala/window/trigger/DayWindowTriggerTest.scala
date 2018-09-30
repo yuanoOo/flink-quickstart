@@ -1,7 +1,7 @@
 package cn.jxau.yuan.scala.yuan.scala.window.trigger
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.triggers.EventTimeTrigger
 import org.joda.time.DateTime
@@ -20,7 +20,6 @@ object DayWindowTriggerTest {
         env.addSource((context: SourceContext[String]) => {while(true) context.collect(new Random().nextInt(100) + ":FRI")})
                 .keyBy(s => s.endsWith("FRI"))
                 .timeWindow(Time.minutes(1))
-                .trigger(new EventTimeTrigger)
                 .sum(0)
 
         env.execute()
