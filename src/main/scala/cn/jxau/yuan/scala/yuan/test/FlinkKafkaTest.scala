@@ -1,6 +1,8 @@
 package cn.jxau.yuan.scala.yuan.test
 
 import java.util.Properties
+
+import org.apache.flink.api.common.ExecutionConfig
 //import suishen.message.event.define.PVEvent
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 
@@ -19,8 +21,10 @@ object FlinkKafkaTest {
         kafkaProps.setProperty("group.id", "flink-01")
 
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-//        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-//        env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
+        val executionConfig = env.getConfig
+        executionConfig.setLatencyTrackingInterval(10)
+        //        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+        //        env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
         //        env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event",
         //            new AbstractDeserializationSchema[PVEvent.Entity] {
