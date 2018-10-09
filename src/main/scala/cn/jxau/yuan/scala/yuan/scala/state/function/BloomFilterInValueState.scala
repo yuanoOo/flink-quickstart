@@ -1,10 +1,10 @@
 package cn.jxau.yuan.scala.yuan.scala.state.function
 
 import com.google.common.hash._
+import org.apache.flink.streaming.api.scala._
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.functions.RichFilterFunction
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
-import org.apache.flink.api.common.typeinfo.{TypeHint, TypeInformation}
 import org.apache.flink.api.java.typeutils.runtime.kryo.KryoSerializer
 import org.apache.flink.configuration.Configuration
 import org.slf4j.LoggerFactory
@@ -51,7 +51,8 @@ class BloomFilterInValueState extends RichFilterFunction[String] {
 
         stateBloomFilter = getRuntimeContext.getState(descriptor)
 
-        val pointDescriptor = new ValueStateDescriptor[Long]("point", new TypeHint[Long]() {}.getTypeInfo)
+        // createTypeInformation[Long]创建类型为Long的TypeInformation，得益于Scala ==> import org.apache.flink.streaming.api.scala._
+        val pointDescriptor = new ValueStateDescriptor[Long]("point", createTypeInformation[Long])
         point = getRuntimeContext.getState(pointDescriptor)
     }
 
