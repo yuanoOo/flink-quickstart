@@ -3,6 +3,7 @@ package cn.jxau.yuan.scala.yuan.scala.window.test
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.time.Time
+import org.apache.flink.streaming.api.windowing.triggers.{ContinuousProcessingTimeTrigger, ProcessingTimeTrigger}
 import org.apache.flink.util.Collector
 import org.joda.time.DateTime
 
@@ -19,16 +20,24 @@ object TumblingProcessTimeWindowTest {
 
     def main(args: Array[String]): Unit = {
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-        env.addSource((context: SourceContext[String]) => {while(true) context.collect(new Random().nextInt(1000) + ":FRI")})
+        env.enableCheckpointing(600000L)
+        env.addSource((context: SourceContext[String]) => {while(true) context.collect(new Random().nextInt(100) + ":FRI")})
                 .keyBy(s => s.endsWith("FRI"))
-                .timeWindow(Time.minutes(1))
-                .apply((e, w, iter, coll: Collector[String]) => {
+                .timeWindow(Time.days(1))
+                .trigger(ContinuousProcessingTimeTrigger.of(Time.seconds(2)))
+                .apply((e, w, iter, coll: Collector[Long]) => {
+                    var i = 0L
                     println("now ===> " + convert(DateTime.now().getMillis))
                     println("start ===> " + convert(w.getStart))
                     println("end ===> " + convert(w.getEnd))
                     println("max ===> " + convert(w.maxTimestamp()))
                     println(w)
-                    coll.collect("aggreation")
+
+                    for (j <- iter){
+                        i = i + j.substring(0, j.length - 4).toInt
+                        if (i > 200000000) throw new Exception
+                    }
+                    coll.collect(i)
                 }).setParallelism(1).print().setParallelism(1)
 
         env.execute()
