@@ -13,18 +13,21 @@ object AllStreamPartitionTest {
 
     def main(args: Array[String]): Unit = {
         val env = StreamExecutionEnvironment.getExecutionEnvironment
-        val ele = env.fromElements("123", "445", "789")
+        env.setParallelism(1)
+        val ele = env.fromElements("123", "445", "789").setParallelism(1)
+        val ele1 = env.fromElements("000", "111", "222").setParallelism(1)
 
-        ele.filter(e => {
-            println("你好呀,狗蛋", e)
+        val union = ele.union(ele1).filter(e => 1 == 1)
+
+        union.filter(e => {
             1 == 1
-        }).setParallelism(2).print().setParallelism(1)
+        }).map(e => e + "streming-1" ).setParallelism(1).print().setParallelism(1)
 
-        ele.filter(e => {
-            println("小鸡炖蘑菇", e)
+        union.filter(e => {
             1 == 1
-        }).setParallelism(2).print().setParallelism(1)
+        }).map(e => e + "streming-2" ).setParallelism(1).print().setParallelism(1)
 
+        println(env.getExecutionPlan)
         env.execute("local")
     }
 }
