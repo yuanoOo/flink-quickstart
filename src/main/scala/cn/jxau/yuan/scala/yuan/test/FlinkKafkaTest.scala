@@ -3,8 +3,11 @@ package cn.jxau.yuan.scala.yuan.test
 import java.util.Properties
 
 import org.apache.flink.api.common.ExecutionConfig
+import org.apache.flink.util.Collector
+
+import scala.collection.immutable
 //import suishen.message.event.define.PVEvent
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.scala._
 
 
 /**
@@ -23,19 +26,11 @@ object FlinkKafkaTest {
         val env = StreamExecutionEnvironment.getExecutionEnvironment
         val executionConfig = env.getConfig
         executionConfig.setLatencyTrackingInterval(10)
-        //        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-        //        env.enableCheckpointing(100000, CheckpointingMode.EXACTLY_ONCE)
 
-        //        env.addSource(new FlinkKafkaConsumer011[PVEvent.Entity]("pv-event",
-        //            new AbstractDeserializationSchema[PVEvent.Entity] {
-        //                override def deserialize(message: Array[Byte]): PVEvent.Entity = PVEvent.Entity.parseFrom(message)
-        //            }, kafkaProps).setStartFromEarliest())
-        //                        .filter(e => {
-        //                            println(e)
-        //                            1 == 1
-        //                        })
-        //                .print()
-
+        env.fromElements(Vector(1, 2)).flatMap((s: Vector[Int], c: Collector[Int]) => s.foreach(c.collect))
+        env.fromElements("1", "2", "3").split(e => {
+            if(e.equals("1")) List("sds") else List("other")
+        } ).select("other").print()
         env.execute("local")
     }
 }
