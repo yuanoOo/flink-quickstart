@@ -11,7 +11,7 @@ case class ComputeResult(key : String,
                          dimensions: mutable.HashMap[String, String],
                          values: mutable.HashMap[String , Double],
                          periods: String = VALUE_UNDEFINED){
-  def +(input: ComputeResult) = {
+  def +(input: ComputeResult): ComputeResult = {
     val rt = this.values(DIMENSION_RT) + input.values(DIMENSION_RT)
     val count = this.values(FIELD_COUNT) + input.values(FIELD_COUNT)
     val successCount = this.values(FIELD_SUCCESS_COUNT) + input.values(FIELD_SUCCESS_COUNT)

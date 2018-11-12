@@ -6,11 +6,12 @@ import org.apache.flink.api.common.state.{ReducingState, ReducingStateDescriptor
 import org.apache.flink.api.java.tuple.Tuple
 import org.apache.flink.configuration.{Configuration, CoreOptions}
 import org.apache.flink.runtime.state.filesystem.FsStateBackend
+import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.triggers.ContinuousProcessingTimeTrigger
+import org.apache.flink.streaming.api.windowing.triggers.{ContinuousProcessingTimeTrigger, CountTrigger}
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 import org.joda.time.DateTime
@@ -29,15 +30,20 @@ object TumblingProcessTimeWindowToleranceTest {
         conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint")
         val env = StreamExecutionEnvironment.createLocalEnvironment(1, conf)
         env.setStateBackend(new FsStateBackend("file:///home/yuan/test/checkpoint"))
+        env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
         env.enableCheckpointing(6000L)
         env.addSource((context: SourceContext[String]) => {
-            while(true) context.collect(new Random().nextInt(100) + ":FRI")
+            for(i <- 0L until 100000L)
+                context.collect(i + ":FRI")
+//            while(true) context.collect(new Random().nextInt(100) + ":FRI")
         })
                 .keyBy(s => s.endsWith("FRI"))
-                .timeWindow(Time.days(1))
-                .trigger(ContinuousProcessingTimeTrigger.of(Time.seconds(2)))
-                .reduce(new MyReduceFunction, new MyProcessWindowFunction)
-                .setParallelism(1).print().setParallelism(1)
+                .timeWindow(Time.seconds(1))
+                .trigger(CountTrigger.of(300))
+//                .trigger(ContinuousProcessingTimeTrigger.of(Time.seconds(2)))
+                .process(new MyProcessWindowFunction)
+//                .reduce(new MyReduceFunction, new MyProcessWindowFunction)
+//                .setParallelism(1)
 
         env.execute()
     }
@@ -61,26 +67,39 @@ object TumblingProcessTimeWindowToleranceTest {
 
         override def process(key: Boolean, context: Context, elements: Iterable[String], out: Collector[String]): Unit = {
             val c = elements.iterator.next()
-            state.add(c.substring(0, c.length - 4).toLong)
-            elements.foreach(e => println("reduce: " + state.get()))
-            if (state.get() >= 910947028) {
-                throw new Exception
-            }
+            println("Window Buffer Size: " + elements.size)
+//            state.add(c.substring(0, c.length - 4).toLong)
+//            elements.foreach(e => println("reduce: " + state.get()))
+//            if (state.get() >= 910947028) {
+//                throw new Exception
+//            }
 
             out.collect(elements.iterator.next())
+        }
+
+        override def clear(context: Context): Unit = {
+            super.clear(context)
+            println("Window Clearing....")
+        }
+
+        override def close(): Unit = {
+            println("window closing...")
+            super.close()
         }
     }
 
     class MyReduceFunction extends ReduceFunction[String]{
         override def reduce(value1: String, value2: String): String = {
-            var q = 0L
-            if (StringUtils.isNumeric(value1)){
-                q = value1.toLong
-            }else {
-                q = value1.substring(0, value1.length - 4).toLong
-            }
-            val w = value2.substring(0, value2.length - 4).toLong
-            (q + w).toString
+
+            //            var q = 0L
+//            if (StringUtils.isNumeric(value1)){
+//                q = value1.toLong
+//            }else {
+//                q = value1.substring(0, value1.length - 4).toLong
+//            }
+//            val w = value2.substring(0, value2.length - 4).toLong
+//            (q + w).toString
+            null
         }
     }
 }
