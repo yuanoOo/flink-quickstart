@@ -23,7 +23,7 @@ public class OperatorStateMain {
 
         // IDE中启用状态后端
         Configuration conf = new Configuration();
-        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint");
+//        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint");
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
@@ -60,7 +60,7 @@ public class OperatorStateMain {
                 .setParallelism(2)
                 .addSink(new SinkFunction<String>() {
                     @Override
-                    public void invoke(String s) throws Exception {
+                    public void invoke(String s) {
                         LOG.warn(Thread.currentThread().getName() + "===>" + s);
                     }
                 });

@@ -20,7 +20,7 @@ public class CheckpointTest {
     public static void main(String[] args) throws Exception {
 
         Configuration conf = new Configuration();
-        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint");
+//        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint");
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment(1, conf);
         env.enableCheckpointing(10L);

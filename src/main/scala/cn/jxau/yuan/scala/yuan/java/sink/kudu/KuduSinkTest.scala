@@ -26,7 +26,7 @@ object KuduSinkTest {
     def main(args: Array[String]): Unit = {
 
         val conf = new Configuration
-        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint")
+//        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint")
         val env = StreamExecutionEnvironment.createLocalEnvironment(1, conf)
 
         env.enableCheckpointing(60000L)

@@ -28,7 +28,7 @@ object TumblingProcessTimeWindowToleranceTest {
 
     def main(args: Array[String]): Unit = {
         val conf = new Configuration
-        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint")
+//        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint")
         val env = StreamExecutionEnvironment.createLocalEnvironment(1, conf)
         env.setStateBackend(new FsStateBackend("file:///home/yuan/test/checkpoint"))
         env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)

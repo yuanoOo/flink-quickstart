@@ -21,7 +21,7 @@ object BloomFilterStateTest {
 
         //--------------------本地容错配置----------------------//
         val conf = new Configuration
-        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint")
+//        conf.setString(CoreOptions.CHECKPOINTS_DIRECTORY, "file:///home/yuan/test/checkpoint")
         val env = StreamExecutionEnvironment.createLocalEnvironment(1, conf)
         env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
         env.enableCheckpointing(5000, CheckpointingMode.EXACTLY_ONCE)
