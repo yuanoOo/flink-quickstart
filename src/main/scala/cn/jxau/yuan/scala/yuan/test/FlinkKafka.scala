@@ -1,4 +1,4 @@
-package cn.jxau.yuan.scala.yuan.test;
+package cn.jxau.yuan.scala.yuan.test
 
 import java.util.Properties
 
