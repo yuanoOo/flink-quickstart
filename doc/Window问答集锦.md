@@ -12,3 +12,38 @@
 
 - 不同的函数最终影响的其实是我们最终window保存数据的state的形式有ListState，也有reducingState…,最终影响了rocksdb和
   checkpoint的大小，不过肯定是能用聚合还是用聚合函数比较好
+  
+  
+## 三、何时调用ProcessWindowFunction的clear()方法
+
+- 源码集中在org.apache.flink.streaming.runtime.operators.windowing.WindowOperator中，会调用clearAllState清理所有的状态，
+  其中processContext.clear()就是调用ProcessWindowFunction的clear()方法。
+- 现在看看何时会调用clearAllState（）方法：发现只有在是EventTime的时候，才会调用ProcessWindowFunction的clear()方法
+```
+		if (windowAssigner.isEventTime() && isCleanupTime(triggerContext.window, timer.getTimestamp())) {
+			clearAllState(triggerContext.window, windowState, mergingWindows);
+		}
+```
+
+```
+	/**
+	 * Drops all state for the given window and calls
+	 * {@link Trigger#clear(Window, Trigger.TriggerContext)}.
+	 *
+	 * <p>The caller must ensure that the
+	 * correct key is set in the state backend and the triggerContext object.
+	 */
+	private void clearAllState(
+			W window,
+			AppendingState<IN, ACC> windowState,
+			MergingWindowSet<W> mergingWindows) throws Exception {
+		windowState.clear();
+		triggerContext.clear();
+		processContext.window = window;
+		processContext.clear();
+		if (mergingWindows != null) {
+			mergingWindows.retireWindow(window);
+			mergingWindows.persist();
+		}
+	}
+```
