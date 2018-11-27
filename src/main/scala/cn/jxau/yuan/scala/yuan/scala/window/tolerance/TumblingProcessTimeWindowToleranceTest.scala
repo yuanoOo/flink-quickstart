@@ -33,6 +33,7 @@ object TumblingProcessTimeWindowToleranceTest {
         env.setStateBackend(new FsStateBackend("file:///home/yuan/test/checkpoint"))
         env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
         env.enableCheckpointing(6000L)
+        env.setParallelism(1)
         env.addSource((context: SourceContext[String]) => {
             for(i <- 0L until 10333445L)
                 context.collect(i + ":FRI")
@@ -41,7 +42,7 @@ object TumblingProcessTimeWindowToleranceTest {
                 .keyBy(s => s.endsWith("FRI"))
                 .timeWindow(Time.seconds(1))
                 .trigger(CountWithProcessingTimeTrigger.of(300))
-                .evictor(CountEvictor.of(0, true))
+//                .evictor(CountEvictor.of(0, true))
 //                .trigger(ContinuousProcessingTimeTrigger.of(Time.seconds(2)))
                 .process(new MyProcessWindowFunction)
 //                .reduce(new MyReduceFunction, new MyProcessWindowFunction)
@@ -70,7 +71,7 @@ object TumblingProcessTimeWindowToleranceTest {
         override def process(key: Boolean, context: Context, elements: Iterable[String], out: Collector[String]): Unit = {
             val c = elements.iterator.next()
             if (elements.size != 300)
-                println("Window Buffer Size: " + elements.size)
+                println("Window Buffer Size: " + elements.size + "  key: " + key)
 //            println("Window Buffer Size: " + elements.size)
 //            state.add(c.substring(0, c.length - 4).toLong)
 //            elements.foreach(e => println("reduce: " + state.get()))

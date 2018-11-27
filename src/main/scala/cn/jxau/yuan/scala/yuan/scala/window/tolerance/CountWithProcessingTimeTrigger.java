@@ -33,7 +33,7 @@ public class CountWithProcessingTimeTrigger<W extends Window> extends Trigger<Ob
         count.add(1L);
         if (count.get() >= maxCount) {
             count.clear();
-            return TriggerResult.FIRE;
+            return TriggerResult.FIRE_AND_PURGE;
         }
         return TriggerResult.CONTINUE;
     }
@@ -44,12 +44,12 @@ public class CountWithProcessingTimeTrigger<W extends Window> extends Trigger<Ob
     }
 
     @Override
-    public TriggerResult onProcessingTime(long time, W window, TriggerContext ctx) throws Exception {
-        return TriggerResult.FIRE;
+    public TriggerResult onProcessingTime(long time, W window, TriggerContext ctx) {
+        return TriggerResult.FIRE_AND_PURGE;
     }
 
     @Override
-    public void clear(W window, TriggerContext ctx) throws Exception {
+    public void clear(W window, TriggerContext ctx) {
         ctx.getPartitionedState(stateDesc).clear();
     }
 
@@ -59,7 +59,7 @@ public class CountWithProcessingTimeTrigger<W extends Window> extends Trigger<Ob
     }
 
     @Override
-    public void onMerge(W window, OnMergeContext ctx) throws Exception {
+    public void onMerge(W window, OnMergeContext ctx) {
         ctx.mergePartitionedState(stateDesc);
     }
 
@@ -82,7 +82,7 @@ public class CountWithProcessingTimeTrigger<W extends Window> extends Trigger<Ob
         private static final long serialVersionUID = 1L;
 
         @Override
-        public Long reduce(Long value1, Long value2) throws Exception {
+        public Long reduce(Long value1, Long value2) {
             return value1 + value2;
         }
 
